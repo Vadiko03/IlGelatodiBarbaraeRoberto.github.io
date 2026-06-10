@@ -530,8 +530,12 @@
     margin-top: 3rem;
   }
   .prezzo-card {
-    background: rgba(255,255,255,0.05);
-    border: 2px solid rgba(245,200,66,0.2);
+    background: linear-gradient(
+        135deg,
+        #5c1a08,
+        #7a2410
+    );
+    border: 2px solid rgba(245,200,66,0.35);
     border-radius: 20px;
     padding: 2rem 1.5rem;
     text-align: center;
@@ -556,10 +560,21 @@
     transform: rotate(35deg);
     letter-spacing: 0.05em;
   }
+  .prezzo-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.08),
+        transparent 40%
+    );
+    pointer-events: none;
+  }
   .prezzo-card:hover {
     transform: translateY(-5px);
     border-color: var(--giallo);
-    box-shadow: 0 15px 40px rgba(245,200,66,0.15);
+    box-shadow: 0 15px 40px rgba(245,200,66,0.25);
   }
   .prezzo-icon { font-size: 2.8rem; margin-bottom: 0.8rem; }
   .prezzo-label {
@@ -569,10 +584,11 @@
     margin-bottom: 0.3rem;
   }
   .prezzo-desc {
-    font-size: 0.78rem;
-    color: rgba(255,255,255,0.55);
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.9);
     margin-bottom: 1rem;
-    line-height: 1.5;
+    line-height: 1.7;
+    font-weight: 500;
   }
   .prezzo-val {
     font-size: 2.2rem;
