@@ -1126,9 +1126,9 @@
         <div class="info-card-icon">🕐</div>
         <h3>Orari di apertura <span class="aperto-badge" id="open-badge">...</span></h3>
         <table class="orari-table">
-          <tr><td>Lunedì – Venerdì</td><td>10:00 – 22:00</td></tr>
-          <tr><td>Sabato</td><td>10:00 – 23:00</td></tr>
-          <tr><td>Domenica</td><td>10:00 – 23:00</td></tr>
+          <tr><td>Lunedì – Venerdì</td><td>10:00 – 00:00</td></tr>
+          <tr><td>Sabato</td><td>08:30 – 00:00</td></tr>
+          <tr><td>Domenica</td><td>08:30 – 00:00</td></tr>
         </table>
         <p style="margin-top:1rem;font-size:0.8rem;opacity:0.6;">Gli orari possono variare nei festivi. Sempre aperti.</p>
       </div>
@@ -1150,7 +1150,6 @@
         <h3>Contatti</h3>
         <p>
           <a href="tel:+390656789012">📱 Chiama per ordinare torte</a><br><br>
-          <a href="https://www.ilgelatodibarbaraeroberto.it" target="_blank">🌐 www.ilgelatodibarbaraeroberto.it</a><br><br>
           <a href="https://www.facebook.com/ilgelatodibarbaraerobert" target="_blank">📘 Facebook</a><br><br>
           Ordini torte personalizzate: almeno <strong style="color:var(--giallo);">48 ore</strong> di anticipo.
         </p>
@@ -1181,11 +1180,11 @@
     </p>
     <div class="gusti-tabs reveal">
       <button class="tab-btn active" onclick="filterGusti('tutti', this)">Tutti</button>
-      <button class="tab-btn" onclick="filterGusti('cremosi', this)">Cremosi al latte</button>
-      <button class="tab-btn" onclick="filterGusti('sorbetti', this)">Sorbetti alla frutta</button>
-      <button class="tab-btn" onclick="filterGusti('siciliani', this)">Tipici siciliani</button>
-      <button class="tab-btn" onclick="filterGusti('speciali', this)">Gusti speciali</button>
-      <button class="tab-btn" onclick="filterGusti('vegani', this)">Vegani</button>
+<button class="tab-btn" onclick="filterGusti('cremosi', this)">Cremosi</button>
+<button class="tab-btn" onclick="filterGusti('speciali', this)">Speciali</button>
+<button class="tab-btn" onclick="filterGusti('siciliani', this)">Siciliani</button>
+<button class="tab-btn" onclick="filterGusti('frutta', this)">Frutta</button>
+<button class="tab-btn" onclick="filterGusti('vegani', this)">Vegani</button>
       <button class="tab-btn" onclick="filterGusti('gf', this)">🌾 Gluten Free</button>
     </div>
     <div class="gusti-grid" id="gusti-grid">
@@ -1802,34 +1801,50 @@
 //  GUSTI DATA
 // ═══════════════════════════════════════════════
 const gusti = [
-  { name: 'Pistacchio di Bronte', emoji: '🟢', cat: ['siciliani','cremosi'], color: '#2d7a3a', extra: '' },
-  { name: 'Mandorla Siciliana', emoji: '🤍', cat: ['siciliani','cremosi'], color: '#c9921a', extra: 'gf' },
-  { name: 'Nocciola Piemonte', emoji: '🟤', cat: ['cremosi'], color: '#8b5e3c', extra: 'gf' },
-  { name: 'Cioccolato Fondente', emoji: '🍫', cat: ['cremosi'], color: '#3b1f0f', extra: 'gf' },
+  // CREMOSI
+  { name: 'Torta Sacher', emoji: '🎂', cat: ['cremosi'], color: '#6b3a1a', extra: '' },
+  { name: 'Torta della Nonna', emoji: '🥧', cat: ['cremosi'], color: '#d4a017', extra: '' },
+  { name: 'Caffè', emoji: '☕', cat: ['cremosi'], color: '#4b2e1f', extra: '' },
+  { name: 'Mandorla', emoji: '🌰', cat: ['cremosi','siciliani'], color: '#c9921a', extra: 'gf' },
+  { name: 'Zabaione', emoji: '🥚', cat: ['cremosi'], color: '#e0b84f', extra: '' },
+  { name: 'Liquirizia', emoji: '⚫', cat: ['cremosi'], color: '#222', extra: 'gf' },
+  { name: 'Fior di Latte', emoji: '🥛', cat: ['cremosi'], color: '#ddd', extra: 'gf' },
+  { name: 'Tiramisù', emoji: '☕', cat: ['cremosi'], color: '#6b3a1a', extra: '' },
+  { name: 'Bounty', emoji: '🥥', cat: ['cremosi'], color: '#c9921a', extra: '' },
+  { name: 'Cocco', emoji: '🥥', cat: ['cremosi'], color: '#f0e6d2', extra: '' },
+  { name: 'Kinder Maxi', emoji: '🍫', cat: ['cremosi'], color: '#8b5e3c', extra: '' },
   { name: 'Stracciatella', emoji: '🖤', cat: ['cremosi'], color: '#555', extra: '' },
-  { name: 'Fior di Latte', emoji: '🥛', cat: ['cremosi'], color: '#aaa', extra: 'gf' },
-  { name: 'Caramello Salato', emoji: '🧂', cat: ['cremosi','speciali'], color: '#d4a017', extra: '' },
-  { name: 'Tiramisù', emoji: '☕', cat: ['cremosi','speciali'], color: '#6b3a1a', extra: '' },
-  { name: 'Cassata Siciliana', emoji: '🎂', cat: ['siciliani','speciali'], color: '#e87c2b', extra: '' },
-  { name: 'Ricotta e Fichi', emoji: '🍑', cat: ['siciliani'], color: '#9b2d9b', extra: '' },
-  { name: 'Torroncino', emoji: '🍬', cat: ['siciliani','cremosi'], color: '#c9921a', extra: '' },
-  { name: 'Fragola fresca', emoji: '🍓', cat: ['sorbetti'], color: '#e84040', extra: 'gf veg' },
-  { name: 'Limone Siciliano', emoji: '🍋', cat: ['sorbetti','siciliani'], color: '#d4c017', extra: 'gf veg' },
-  { name: 'Mango', emoji: '🥭', cat: ['sorbetti'], color: '#e87c2b', extra: 'gf veg' },
-  { name: 'Frutti di Bosco', emoji: '🫐', cat: ['sorbetti'], color: '#6b3fa0', extra: 'gf veg' },
-  { name: 'Arancia Rossa', emoji: '🍊', cat: ['sorbetti','siciliani'], color: '#cc4400', extra: 'gf veg' },
-  { name: 'Melone', emoji: '🍈', cat: ['sorbetti'], color: '#6a9a2a', extra: 'gf veg' },
-  { name: 'Lampone', emoji: '❤️', cat: ['sorbetti'], color: '#cc1155', extra: 'gf veg' },
-  { name: 'Cocco', emoji: '🥥', cat: ['sorbetti','vegani'], color: '#c9921a', extra: 'gf veg' },
+  { name: 'Kinder Bueno', emoji: '🍫', cat: ['cremosi'], color: '#a56a43', extra: '' },
+  { name: 'Pistacchio', emoji: '💚', cat: ['cremosi','siciliani'], color: '#2d7a3a', extra: '' },
+  { name: 'Cioccolato Fondente', emoji: '🍫', cat: ['cremosi'], color: '#3b1f0f', extra: 'gf' },
   { name: 'Cioccolato al Latte', emoji: '🍫', cat: ['cremosi'], color: '#8b5e3c', extra: '' },
-  { name: 'Panna cotta e fragole', emoji: '🍮', cat: ['speciali'], color: '#e84070', extra: '' },
-  { name: 'Fiore di Fico', emoji: '🌸', cat: ['siciliani','speciali'], color: '#7b3f9b', extra: 'gf' },
-  { name: 'Sesamo nero', emoji: '⚫', cat: ['siciliani','speciali'], color: '#222', extra: '' },
-  { name: 'Cioccolato vegano', emoji: '🌱', cat: ['vegani'], color: '#3b1f0f', extra: 'veg gf' },
-  { name: 'Latte di mandorla', emoji: '🌿', cat: ['vegani','siciliani'], color: '#c9921a', extra: 'veg gf' },
-  { name: 'Pistacchio vegano', emoji: '🌱', cat: ['vegani'], color: '#2d7a3a', extra: 'veg gf' },
-  { name: 'Granita Caffè', emoji: '☕', cat: ['siciliani'], color: '#3b1f0f', extra: 'gf' },
-  { name: 'Granita Mandorla', emoji: '🤍', cat: ['siciliani'], color: '#c9921a', extra: 'gf veg' },
+  { name: 'Crema', emoji: '🍮', cat: ['cremosi'], color: '#f0d080', extra: '' },
+  { name: 'Nocciola', emoji: '🌰', cat: ['cremosi'], color: '#8b5e3c', extra: '' },
+  { name: 'Cremino', emoji: '🍫', cat: ['cremosi'], color: '#6b4c3b', extra: '' },
+
+  // SICILIANI
+  { name: 'Cannolo', emoji: '🧁', cat: ['siciliani'], color: '#c9921a', extra: '' },
+
+  // SPECIALI
+  { name: 'Barbara & Roberto', emoji: '🍮', cat: ['speciali'], color: '#c9921a', extra: '' },
+  { name: 'Cheesecake', emoji: '🍰', cat: ['speciali'], color: '#f4d6a0', extra: '' },
+  { name: 'Caramello Salato', emoji: '🧂', cat: ['speciali'], color: '#d4a017', extra: '' },
+  { name: 'Croccante Amarena', emoji: '🍒', cat: ['speciali'], color: '#9b1c31', extra: '' },
+  { name: 'Setteveli Cioccolato', emoji: '🍫', cat: ['speciali'], color: '#3b1f0f', extra: '' },
+  { name: 'Setteveli Pistacchio', emoji: '💚', cat: ['speciali'], color: '#2d7a3a', extra: '' },
+  { name: 'Millefoglie', emoji: '🥮', cat: ['speciali'], color: '#e0c070', extra: '' },
+  { name: 'Baciamo le Mani', emoji: '🤌', cat: ['speciali','siciliani'], color: '#8b5e3c', extra: '' },
+  { name: 'Yogurt', emoji: '🥣', cat: ['speciali'], color: '#ddd', extra: '' },
+
+  // FRUTTA
+  { name: 'Fragola', emoji: '🍓', cat: ['frutta'], color: '#e84040', extra: 'veg gf' },
+  { name: 'Limone', emoji: '🍋', cat: ['frutta','siciliani'], color: '#d4c017', extra: 'veg gf' },
+  { name: 'Banana', emoji: '🍌', cat: ['frutta'], color: '#f0d020', extra: 'veg gf' },
+  { name: 'Melone', emoji: '🍈', cat: ['frutta'], color: '#6a9a2a', extra: 'veg gf' },
+  { name: 'Frutti di Bosco', emoji: '🫐', cat: ['frutta'], color: '#6b3fa0', extra: 'veg gf' },
+  { name: 'Lampone', emoji: '❤️', cat: ['frutta'], color: '#cc1155', extra: 'veg gf' },
+  { name: 'Gelso', emoji: '🫐', cat: ['frutta'], color: '#4b2354', extra: 'veg gf' },
+  { name: 'Mango', emoji: '🥭', cat: ['frutta'], color: '#e87c2b', extra: 'veg gf' }
 ];
 
 function renderGusti(filter) {
