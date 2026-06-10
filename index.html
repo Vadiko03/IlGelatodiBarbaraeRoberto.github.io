@@ -1,0 +1,1945 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Il Gelato di Barbara e Roberto – Infernetto, Roma</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --azzurro: #1a7abf;
+    --giallo: #f5c842;
+    --arancio: #e87c2b;
+    --verde: #2d7a3a;
+    --bianco: #fdfaf4;
+    --crema: #f8edd8;
+    --terra: #8b3a1a;
+    --blu-scuro: #0d2b4e;
+    --oro: #c9921a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Lato', sans-serif;
+    background: var(--crema);
+    color: var(--blu-scuro);
+    overflow-x: hidden;
+  }
+
+  /* ─── CANVAS THREE.JS ─── */
+  #bg-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ─── NAVBAR ─── */
+  nav {
+    position: fixed;
+    top: 0; width: 100%;
+    z-index: 1000;
+    background: rgba(13,43,78,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 3px solid var(--giallo);
+    padding: 0 2rem;
+  }
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 70px;
+  }
+  .nav-logo {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.6rem;
+    color: var(--giallo);
+    text-decoration: none;
+    letter-spacing: 1px;
+  }
+  .nav-links {
+    display: flex;
+    gap: 0.2rem;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--bianco);
+    text-decoration: none;
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.4rem 0.7rem;
+    border-radius: 4px;
+    transition: all 0.25s;
+    font-weight: 700;
+  }
+  .nav-links a:hover {
+    background: var(--giallo);
+    color: var(--blu-scuro);
+  }
+  .nav-cta {
+    background: var(--arancio) !important;
+    color: white !important;
+    border-radius: 20px !important;
+    padding: 0.4rem 1.1rem !important;
+  }
+  .nav-cta:hover { background: var(--giallo) !important; color: var(--blu-scuro) !important; }
+
+  /* ─── HERO ─── */
+  #hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    z-index: 1;
+    padding: 100px 2rem 2rem;
+  }
+  .hero-maiolica-border {
+    position: absolute;
+    inset: 0;
+    border: 20px solid transparent;
+    border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Crect width='60' height='60' fill='%230d2b4e'/%3E%3Ccircle cx='30' cy='30' r='18' fill='none' stroke='%23f5c842' stroke-width='3'/%3E%3Ccircle cx='30' cy='30' r='10' fill='%231a7abf'/%3E%3Ccircle cx='30' cy='30' r='4' fill='%23f5c842'/%3E%3Cpath d='M30 12 L34 22 L44 22 L36 28 L39 38 L30 32 L21 38 L24 28 L16 22 L26 22Z' fill='none' stroke='%23e87c2b' stroke-width='1.5'/%3E%3C/svg%3E") 20 repeat;
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0.6;
+  }
+  .hero-tag {
+    font-size: 0.78rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--arancio);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .hero-tag::before, .hero-tag::after {
+    content: '✦';
+    color: var(--giallo);
+  }
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+    color: white;
+    text-shadow: 0 2px 30px rgba(0,0,0,0.7);
+    line-height: 1.05;
+    margin-bottom: 0.4rem;
+  }
+  .hero-title span {
+    color: var(--giallo);
+    font-style: italic;
+  }
+  .hero-subtitle {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(1.4rem, 3vw, 2.2rem);
+    color: var(--giallo);
+    margin-bottom: 1.5rem;
+    letter-spacing: 1px;
+  }
+  .hero-desc {
+    max-width: 560px;
+    color: rgba(255,255,255,0.88);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin-bottom: 2rem;
+    font-weight: 300;
+  }
+  .hero-badges {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+  }
+  .badge {
+    background: rgba(255,255,255,0.12);
+    border: 1.5px solid rgba(245,200,66,0.6);
+    border-radius: 30px;
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+    color: var(--giallo);
+    letter-spacing: 0.05em;
+    backdrop-filter: blur(4px);
+  }
+  .hero-btns {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    background: var(--giallo);
+    color: var(--blu-scuro);
+    border: none;
+    padding: 0.85rem 2rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    display: inline-block;
+  }
+  .btn-primary:hover {
+    background: var(--arancio);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(232,124,43,0.4);
+  }
+  .btn-outline {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    padding: 0.85rem 2rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    display: inline-block;
+  }
+  .btn-outline:hover {
+    background: white;
+    color: var(--blu-scuro);
+    transform: translateY(-2px);
+  }
+
+  /* ─── SCROLL INDICATOR ─── */
+  .scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    animation: bounce 2s infinite;
+  }
+  .scroll-hint::after {
+    content: '';
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.6), transparent);
+  }
+  @keyframes bounce {
+    0%,100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(6px); }
+  }
+
+  /* ─── DIVIDERS MAIOLICA ─── */
+  .maiolica-divider {
+    width: 100%;
+    height: 24px;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--azzurro) 0px, var(--azzurro) 20px,
+      var(--giallo) 20px, var(--giallo) 40px,
+      var(--verde) 40px, var(--verde) 60px,
+      var(--arancio) 60px, var(--arancio) 80px,
+      var(--terra) 80px, var(--terra) 100px
+    );
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ─── SECTIONS BASE ─── */
+  section {
+    position: relative;
+    z-index: 1;
+  }
+  .section-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 5rem 2rem;
+  }
+  .section-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--azzurro);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .section-label::before { content: '❧'; font-size: 1rem; }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    color: var(--blu-scuro);
+    margin-bottom: 1.5rem;
+    line-height: 1.15;
+  }
+  .section-title em { color: var(--arancio); font-style: italic; }
+
+  /* ─── PATTERN BG ─── */
+  .bg-pattern {
+    background-color: var(--crema);
+    background-image:
+      radial-gradient(circle at 20px 20px, rgba(26,122,191,0.08) 2px, transparent 2px),
+      radial-gradient(circle at 60px 60px, rgba(245,200,66,0.08) 2px, transparent 2px);
+    background-size: 80px 80px;
+  }
+  .bg-blu {
+    background: var(--blu-scuro);
+  }
+  .bg-terra {
+    background: #5c1a08;
+  }
+
+  /* ─── CHI SIAMO ─── */
+  #chi-siamo .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+  .storia-text p {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: #334;
+    margin-bottom: 1.2rem;
+    font-weight: 300;
+  }
+  .storia-text p strong { color: var(--terra); font-weight: 700; }
+  .maiolica-frame {
+    position: relative;
+    border-radius: 12px;
+    overflow: visible;
+  }
+  .maiolica-tile-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 90px);
+    gap: 4px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(13,43,78,0.25);
+  }
+  .tile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .tile::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: inherit;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .tile:hover {
+    transform: scale(1.12) rotate(3deg);
+    z-index: 10;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+  .t1 { background: var(--azzurro); }
+  .t2 { background: var(--giallo); }
+  .t3 { background: var(--verde); }
+  .t4 { background: var(--arancio); }
+  .t5 { background: var(--terra); }
+  .t6 { background: #9b2d9b; }
+  .t7 { background: #1a9abf; }
+  .t8 { background: var(--blu-scuro); }
+  .t9 { background: #d4a017; }
+  .tile-svg {
+    width: 50px;
+    height: 50px;
+  }
+
+  /* ─── ORARI & INFO ─── */
+  #info { background: var(--blu-scuro); }
+  #info .section-title { color: var(--giallo); }
+  #info .section-label { color: rgba(245,200,66,0.7); }
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+  .info-card {
+    background: rgba(255,255,255,0.06);
+    border: 1.5px solid rgba(245,200,66,0.25);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.35s;
+    cursor: default;
+  }
+  .info-card:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: var(--giallo);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(245,200,66,0.15);
+  }
+  .info-card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  .info-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    color: var(--giallo);
+    margin-bottom: 0.8rem;
+  }
+  .info-card p, .info-card a {
+    color: rgba(255,255,255,0.75);
+    font-size: 0.9rem;
+    line-height: 1.7;
+    text-decoration: none;
+  }
+  .info-card a:hover { color: var(--giallo); }
+  .orari-table { width: 100%; }
+  .orari-table tr td {
+    color: rgba(255,255,255,0.75);
+    font-size: 0.88rem;
+    padding: 3px 0;
+  }
+  .orari-table tr td:last-child {
+    text-align: right;
+    color: var(--giallo);
+    font-weight: 700;
+  }
+  .aperto-badge {
+    display: inline-block;
+    background: #2d7a3a;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  /* ─── GUSTI GELATO ─── */
+  #gusti { background: var(--crema); }
+  .gusti-tabs {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+    border-bottom: 2px solid rgba(13,43,78,0.1);
+    padding-bottom: 1rem;
+  }
+  .tab-btn {
+    background: transparent;
+    border: 2px solid var(--azzurro);
+    color: var(--azzurro);
+    padding: 0.5rem 1.3rem;
+    border-radius: 30px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .tab-btn.active, .tab-btn:hover {
+    background: var(--azzurro);
+    color: white;
+  }
+  .gusti-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.2rem;
+  }
+  .gusto-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.3rem 1rem;
+    text-align: center;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 2px 12px rgba(13,43,78,0.06);
+    position: relative;
+    overflow: hidden;
+  }
+  .gusto-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--card-color, var(--azzurro));
+    transform: scaleX(0);
+    transition: transform 0.35s;
+  }
+  .gusto-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    border-color: var(--card-color, var(--azzurro));
+    box-shadow: 0 12px 30px rgba(13,43,78,0.12);
+  }
+  .gusto-card:hover::before { transform: scaleX(1); }
+  .gusto-emoji { font-size: 2.5rem; margin-bottom: 0.6rem; display: block; }
+  .gusto-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--blu-scuro);
+    margin-bottom: 0.2rem;
+  }
+  .gusto-tag {
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #888;
+    font-weight: 700;
+  }
+  .gusto-tag.gf { color: var(--verde); }
+  .gusto-tag.veg { color: #6b3fa0; }
+  .gusto-tag.speciale { color: var(--arancio); }
+  .hidden { display: none !important; }
+
+  /* ─── PREZZI ─── */
+  #prezzi { background: var(--blu-scuro); }
+  #prezzi .section-title { color: var(--giallo); }
+  #prezzi .section-label { color: rgba(245,200,66,0.7); }
+  .prezzi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .prezzo-card {
+    background: rgba(255,255,255,0.05);
+    border: 2px solid rgba(245,200,66,0.2);
+    border-radius: 20px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    transition: all 0.35s;
+    cursor: default;
+    position: relative;
+    overflow: hidden;
+  }
+  .prezzo-card.featured {
+    border-color: var(--giallo);
+    background: rgba(245,200,66,0.08);
+  }
+  .prezzo-card.featured::after {
+    content: '⭐ Più scelto';
+    position: absolute;
+    top: 12px; right: -25px;
+    background: var(--giallo);
+    color: var(--blu-scuro);
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 3px 35px;
+    transform: rotate(35deg);
+    letter-spacing: 0.05em;
+  }
+  .prezzo-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--giallo);
+    box-shadow: 0 15px 40px rgba(245,200,66,0.15);
+  }
+  .prezzo-icon { font-size: 2.8rem; margin-bottom: 0.8rem; }
+  .prezzo-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: white;
+    margin-bottom: 0.3rem;
+  }
+  .prezzo-desc {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+  .prezzo-val {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--giallo);
+    font-family: 'Playfair Display', serif;
+  }
+  .prezzo-val small { font-size: 1rem; font-weight: 400; }
+
+  /* ─── GLUTEN FREE ─── */
+  #glutenfree { background: #f0f7f0; }
+  .gf-hero {
+    background: linear-gradient(135deg, #2d7a3a 0%, #1a5228 100%);
+    border-radius: 20px;
+    padding: 3rem;
+    color: white;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2rem;
+    align-items: center;
+    margin-bottom: 3rem;
+  }
+  .gf-hero h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    margin-bottom: 0.8rem;
+  }
+  .gf-hero p {
+    font-size: 1rem;
+    line-height: 1.7;
+    opacity: 0.88;
+    font-weight: 300;
+  }
+  .gf-badge-big {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    border: 3px solid rgba(255,255,255,0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-weight: 700;
+  }
+  .gf-badge-big .gf-icon { font-size: 2.5rem; }
+  .gf-badge-big span { font-size: 0.7rem; letter-spacing: 0.1em; margin-top: 4px; }
+
+  /* ─── PASTICCERIA ─── */
+  #pasticceria { background: var(--crema); }
+  .torte-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+  .torta-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(13,43,78,0.08);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    cursor: pointer;
+    position: relative;
+  }
+  .torta-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 50px rgba(13,43,78,0.15);
+  }
+  .torta-img {
+    width: 100%;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .torta-img::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: inherit;
+    opacity: 0.3;
+    filter: blur(20px);
+  }
+  .torta-body {
+    padding: 1.5rem;
+  }
+  .torta-body h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    color: var(--blu-scuro);
+    margin-bottom: 0.4rem;
+  }
+  .torta-body p {
+    font-size: 0.88rem;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    font-weight: 300;
+  }
+  .torta-tags {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+  .torta-tag {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 10px;
+    background: var(--crema);
+    color: var(--blu-scuro);
+    border: 1px solid rgba(13,43,78,0.15);
+  }
+  .torta-tag.personalizzabile { background: #fff3e0; color: #e65100; border-color: #e65100; }
+  .torta-tag.gf-tag { background: #e8f5e9; color: #2d7a3a; border-color: #2d7a3a; }
+
+  /* ─── MAPPA / DOVE SIAMO ─── */
+  #dove-siamo { background: var(--blu-scuro); }
+  #dove-siamo .section-title { color: var(--giallo); }
+  #dove-siamo .section-label { color: rgba(245,200,66,0.7); }
+  .dove-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 3rem;
+    align-items: start;
+    margin-top: 3rem;
+  }
+  .mappa-container {
+    border-radius: 16px;
+    overflow: hidden;
+    border: 3px solid var(--giallo);
+    box-shadow: 0 0 40px rgba(245,200,66,0.2);
+    height: 400px;
+  }
+  .mappa-container iframe {
+    width: 100%; height: 100%;
+    border: none;
+  }
+  .indirizzo-info { color: rgba(255,255,255,0.85); }
+  .indirizzo-info h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: white;
+    margin-bottom: 1.5rem;
+  }
+  .indirizzo-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .indirizzo-row:last-child { border-bottom: none; }
+  .ind-icon { font-size: 1.5rem; flex-shrink: 0; }
+  .ind-text strong { display: block; color: var(--giallo); font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 3px; }
+  .ind-text span { font-size: 0.92rem; line-height: 1.5; }
+  .ind-text a { color: var(--giallo); text-decoration: none; }
+  .ind-text a:hover { text-decoration: underline; }
+  .btn-maps {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--giallo);
+    color: var(--blu-scuro);
+    padding: 0.7rem 1.5rem;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: all 0.3s;
+    margin-top: 1rem;
+  }
+  .btn-maps:hover { background: var(--arancio); color: white; }
+
+  /* ─── RECENSIONI ─── */
+  #recensioni { background: var(--crema); }
+  .stars { color: var(--giallo); font-size: 1rem; letter-spacing: 2px; }
+  .rec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .rec-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.8rem;
+    box-shadow: 0 4px 16px rgba(13,43,78,0.07);
+    border-left: 4px solid var(--azzurro);
+    transition: all 0.3s;
+    position: relative;
+  }
+  .rec-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 35px rgba(13,43,78,0.12);
+    border-left-color: var(--arancio);
+  }
+  .rec-card::before {
+    content: '"';
+    position: absolute;
+    top: 0.5rem; right: 1rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    color: rgba(26,122,191,0.1);
+    line-height: 1;
+  }
+  .rec-stars { margin-bottom: 0.5rem; }
+  .rec-text {
+    font-size: 0.92rem;
+    line-height: 1.7;
+    color: #445;
+    font-style: italic;
+    font-weight: 300;
+    margin-bottom: 1rem;
+  }
+  .rec-author {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  .rec-avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+  .rec-author-info strong { font-size: 0.88rem; display: block; color: var(--blu-scuro); }
+  .rec-author-info span { font-size: 0.75rem; color: #888; }
+
+  /* ─── ORDINA ─── */
+  #ordina { background: var(--terra); }
+  #ordina .section-title { color: white; }
+  #ordina .section-label { color: rgba(255,255,255,0.6); }
+  .ordina-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-top: 3rem;
+    align-items: start;
+  }
+  .ordina-form {
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 2.5rem;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .form-group { margin-bottom: 1.2rem; }
+  .form-label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 0.4rem;
+  }
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.1);
+    border: 1.5px solid rgba(255,255,255,0.25);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    color: white;
+    font-size: 0.92rem;
+    font-family: 'Lato', sans-serif;
+    transition: border-color 0.25s;
+    appearance: none;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none;
+    border-color: var(--giallo);
+  }
+  .form-input::placeholder, .form-textarea::placeholder { color: rgba(255,255,255,0.4); }
+  .form-select option { background: var(--terra); }
+  .form-textarea { resize: vertical; min-height: 100px; }
+  .form-submit {
+    width: 100%;
+    background: var(--giallo);
+    color: var(--blu-scuro);
+    border: none;
+    padding: 1rem;
+    border-radius: 50px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 0.5rem;
+  }
+  .form-submit:hover { background: white; transform: scale(1.02); }
+  .ordina-info {
+    color: white;
+  }
+  .ordina-info h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+    font-style: italic;
+  }
+  .ordina-info p {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    opacity: 0.85;
+    margin-bottom: 1.5rem;
+    font-weight: 300;
+  }
+  .contatti-links { display: flex; flex-direction: column; gap: 0.8rem; }
+  .contatto-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s;
+    font-size: 0.92rem;
+  }
+  .contatto-link:hover {
+    background: var(--giallo);
+    color: var(--blu-scuro);
+    transform: translateX(6px);
+  }
+  .contatto-link span { font-size: 1.5rem; flex-shrink: 0; }
+
+  /* ─── TOAST ─── */
+  #toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--verde);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    z-index: 9999;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+  #toast.show { transform: translateY(0); opacity: 1; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: #06192e;
+    color: rgba(255,255,255,0.6);
+    text-align: center;
+    padding: 2.5rem 2rem;
+    position: relative;
+    z-index: 1;
+  }
+  .footer-logo {
+    font-family: 'Dancing Script', cursive;
+    font-size: 2.2rem;
+    color: var(--giallo);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  footer p { font-size: 0.83rem; line-height: 1.8; }
+  footer a { color: var(--giallo); text-decoration: none; }
+  .footer-maiolica {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin: 1rem 0;
+  }
+  .fm { width: 20px; height: 20px; border-radius: 3px; }
+
+  /* ─── MOBILE ─── */
+  #hamburger {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.6rem;
+    cursor: pointer;
+  }
+  @media (max-width: 900px) {
+    .nav-links { display: none; flex-direction: column; position: absolute; top: 70px; left: 0; right: 0; background: rgba(13,43,78,0.98); padding: 1rem 2rem; gap: 0; }
+    .nav-links.open { display: flex; }
+    .nav-links a { padding: 0.7rem 0; border-radius: 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    #hamburger { display: block; }
+    #chi-siamo .content-grid { grid-template-columns: 1fr; }
+    .dove-grid { grid-template-columns: 1fr; }
+    .ordina-grid { grid-template-columns: 1fr; }
+    .gf-hero { grid-template-columns: 1fr; }
+    .gf-badge-big { margin: 0 auto; }
+  }
+
+  /* ─── ANIMAZIONI ENTRATA ─── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ─── FLOATING GELATO MENU ─── */
+  #gelato-float {
+    position: fixed;
+    right: 2rem;
+    bottom: 5rem;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-end;
+  }
+  .float-btn {
+    background: var(--giallo);
+    color: var(--blu-scuro);
+    border: none;
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .float-btn:hover { transform: scale(1.1) rotate(-5deg); background: var(--arancio); color: white; }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-inner">
+    <a href="#hero" class="nav-logo">🍦 Il Gelato di Barbara e Roberto</a>
+    <button id="hamburger" onclick="toggleMenu()">☰</button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#chi-siamo">Chi siamo</a></li>
+      <li><a href="#info">Orari</a></li>
+      <li><a href="#gusti">Gusti</a></li>
+      <li><a href="#prezzi">Prezzi</a></li>
+      <li><a href="#glutenfree">Gluten Free</a></li>
+      <li><a href="#pasticceria">Pasticceria</a></li>
+      <li><a href="#dove-siamo">Dove siamo</a></li>
+      <li><a href="#ordina" class="nav-cta">Ordina ora</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-maiolica-border"></div>
+  <div class="hero-tag">Artigianale · Siciliano · Infernetto, Roma</div>
+  <h1 class="hero-title">Il Gelato di<br><span>Barbara e Roberto</span></h1>
+  <p class="hero-subtitle">La dolcezza della Sicilia nel cuore di Roma</p>
+  <p class="hero-desc">
+    Gelato artigianale, pasticceria siciliana, torte personalizzate e cannoli farciti al momento.
+    Dal latte fresco locale alle ricette di tradizione, ogni giorno un'esplosione autentica di sapori.
+  </p>
+  <div class="hero-badges">
+    <span class="badge">🏅 4.7★ su Google</span>
+    <span class="badge">🍋 Gusti Siciliani</span>
+    <span class="badge">🌾 Opzioni Gluten Free</span>
+    <span class="badge">🎂 Torte Personalizzate</span>
+    <span class="badge">🥐 Pasticceria Fresca</span>
+  </div>
+  <div class="hero-btns">
+    <a href="#gusti" class="btn-primary">Scopri i gusti</a>
+    <a href="#ordina" class="btn-outline">Ordina una torta</a>
+  </div>
+  <div class="scroll-hint">Scorri</div>
+</section>
+
+<div class="maiolica-divider"></div>
+
+<!-- CHI SIAMO -->
+<section id="chi-siamo" class="bg-pattern">
+  <div class="section-inner">
+    <div class="content-grid">
+      <div class="storia-text reveal">
+        <div class="section-label">La nostra storia</div>
+        <h2 class="section-title">Una storia di <em>passione</em> e sapori autentici</h2>
+        <p>
+          <strong>Barbara e Roberto</strong> portano con sé la vera tradizione siciliana del gelato artigianale, 
+          preparato ogni giorno con ingredienti freschi e selezionati. Situati nel <strong>Centro Commerciale Colombia</strong> 
+          all'Infernetto, sono diventati un punto di riferimento imprescindibile per tutto il quartiere e oltre.
+        </p>
+        <p>
+          Il latte fresco proviene dai migliori allevamenti locali, la frutta di stagione è raccolta 
+          al punto giusto di maturazione, le paste di pistacchio, mandorla e nocciola arrivano 
+          direttamente dai produttori siciliani più rinomati.
+        </p>
+        <p>
+          I cannoli vengono farciti <strong>espressi al momento</strong> per mantenere la fragranza della cialda. 
+          Le torte gelato sono vere opere d'arte, personalizzabili per ogni occasione.
+          Con <strong>oltre 184 recensioni e 4.7 stelle</strong>, la qualità parla da sola.
+        </p>
+        <a href="#gusti" class="btn-primary" style="display:inline-block;margin-top:1.5rem;">
+          Esplora il menu →
+        </a>
+      </div>
+      <div class="maiolica-frame reveal">
+        <div class="maiolica-tile-grid" id="tile-grid">
+          <div class="tile t1" onclick="pulseTile(this)"><svg class="tile-svg" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2"/><circle cx="25" cy="25" r="10" fill="rgba(255,255,255,0.3)"/><path d="M25 10 L28 19 L38 19 L30 25 L33 35 L25 29 L17 35 L20 25 L12 19 L22 19Z" fill="rgba(255,255,255,0.6)"/></svg></div>
+          <div class="tile t2" onclick="pulseTile(this)"><svg class="tile-svg" viewBox="0 0 50 50"><rect x="10" y="10" width="30" height="30" rx="4" fill="none" stroke="rgba(13,43,78,0.6)" stroke-width="2"/><circle cx="25" cy="25" r="8" fill="rgba(13,43,78,0.3)"/><path d="M18 18 L32 32 M32 18 L18 32" stroke="rgba(13,43,78,0.5)" stroke-width="1.5"/></svg></div>
+          <div class="tile t3" onclick="pulseTile(this)"><svg class="tile-svg" viewBox="0 0 50 50"><path d="M25 8 C15 8 8 15 8 25 C8 35 15 42 25 42 C35 42 42 35 42 25 C42 15 35 8 25 8Z" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2"/><path d="M25 15 L25 35 M15 25 L35 25" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"/><circle cx="25" cy="25" r="5" fill="rgba(255,255,255,0.5)"/></svg></div>
+          <div class="tile t4" onclick="pulseTile(this)"><svg class="tile-svg" viewBox="0 0 50 50"><polygon points="25,8 32,18 44,18 35,27 38,39 25,32 12,39 15,27 6,18 18,18" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2"/></svg></div>
+          <div class="tile t5" style="font-size:3.5rem;" onclick="pulseTile(this)">🍦</div>
+          <div class="tile t6" onclick="pulseTile(this)"><svg class="tile-svg" viewBox="0 0 50 50"><circle cx="25" cy="25" r="18" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2"/><circle cx="25" cy="25" r="6" fill="rgba(255,255,255,0.5)"/><path d="M25 7 L25 43 M7 25 L43 25 M13 13 L37 37 M37 13 L13 37" stroke="rgba(255,255,255,0.3)" stroke-width="1"/></svg></div>
+          <div class="tile t7" onclick="pulseTile(this)"><svg class="tile-svg" viewBox="0 0 50 50"><rect x="12" y="12" width="12" height="12" rx="3" fill="rgba(255,255,255,0.5)"/><rect x="26" y="12" width="12" height="12" rx="3" fill="rgba(255,255,255,0.3)"/><rect x="12" y="26" width="12" height="12" rx="3" fill="rgba(255,255,255,0.3)"/><rect x="26" y="26" width="12" height="12" rx="3" fill="rgba(255,255,255,0.5)"/></svg></div>
+          <div class="tile t8" onclick="pulseTile(this)"><svg class="tile-svg" viewBox="0 0 50 50"><path d="M10 40 Q25 10 40 40" fill="none" stroke="var(--giallo)" stroke-width="3"/><circle cx="25" cy="15" r="5" fill="var(--giallo)"/></svg></div>
+          <div class="tile t9" onclick="pulseTile(this)"><svg class="tile-svg" viewBox="0 0 50 50"><circle cx="25" cy="25" r="15" fill="none" stroke="rgba(13,43,78,0.7)" stroke-width="3"/><circle cx="25" cy="25" r="8" fill="rgba(13,43,78,0.4)"/><circle cx="25" cy="25" r="3" fill="rgba(13,43,78,0.6)"/></svg></div>
+        </div>
+        <p style="text-align:center;margin-top:1rem;font-size:0.78rem;color:#888;letter-spacing:0.1em;">
+          ✦ Tocca le piastrelle per interagire ✦
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="maiolica-divider"></div>
+
+<!-- ORARI E INFO -->
+<section id="info">
+  <div class="section-inner">
+    <div class="section-label">Dove e quando</div>
+    <h2 class="section-title reveal">Informazioni <em>pratiche</em></h2>
+    <div class="info-grid">
+      <div class="info-card reveal">
+        <div class="info-card-icon">🕐</div>
+        <h3>Orari di apertura <span class="aperto-badge" id="open-badge">...</span></h3>
+        <table class="orari-table">
+          <tr><td>Lunedì – Venerdì</td><td>10:00 – 22:00</td></tr>
+          <tr><td>Sabato</td><td>10:00 – 23:00</td></tr>
+          <tr><td>Domenica</td><td>10:00 – 23:00</td></tr>
+        </table>
+        <p style="margin-top:1rem;font-size:0.8rem;opacity:0.6;">Gli orari possono variare nei festivi. Sempre aperti.</p>
+      </div>
+      <div class="info-card reveal">
+        <div class="info-card-icon">📍</div>
+        <h3>Dove siamo</h3>
+        <p>
+          <strong style="color:var(--giallo);">Via Giambattista Bassani, 22–24</strong><br>
+          Centro Commerciale Colombia<br>
+          Infernetto, Roma (RM)<br><br>
+          Nel piccolo centro commerciale insieme a negozi, farmacia, ristoranti, palestra e forno.
+        </p>
+        <a href="https://maps.google.com/?q=Via+Giambattista+Bassani+22+Roma" target="_blank" style="color:var(--giallo);font-size:0.85rem;margin-top:0.5rem;display:inline-block;">
+          → Apri in Google Maps
+        </a>
+      </div>
+      <div class="info-card reveal">
+        <div class="info-card-icon">📞</div>
+        <h3>Contatti</h3>
+        <p>
+          <a href="tel:+390656789012">📱 Chiama per ordinare torte</a><br><br>
+          <a href="https://www.ilgelatodibarbaraeroberto.it" target="_blank">🌐 www.ilgelatodibarbaraeroberto.it</a><br><br>
+          <a href="https://www.facebook.com/ilgelatodibarbaraerobert" target="_blank">📘 Facebook</a><br><br>
+          Ordini torte personalizzate: almeno <strong style="color:var(--giallo);">48 ore</strong> di anticipo.
+        </p>
+      </div>
+      <div class="info-card reveal">
+        <div class="info-card-icon">🚗</div>
+        <h3>Come raggiungerci</h3>
+        <p>
+          <strong style="color:var(--giallo);">Auto:</strong> Parcheggio gratuito nel centro commerciale Colombia.<br><br>
+          <strong style="color:var(--giallo);">Bus:</strong> Linee Roma TPL – Infernetto, fermata Colombia.<br><br>
+          <strong style="color:var(--giallo);">Bici:</strong> Rastrelliera disponibile davanti all'ingresso.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="maiolica-divider"></div>
+
+<!-- GUSTI GELATO -->
+<section id="gusti" class="bg-pattern">
+  <div class="section-inner">
+    <div class="section-label">Il nostro gelato</div>
+    <h2 class="section-title reveal">I gusti del <em>giorno</em></h2>
+    <p class="reveal" style="max-width:600px;color:#445;font-weight:300;margin-bottom:2rem;line-height:1.7;">
+      Tutti i gusti sono preparati ogni mattina con ingredienti freschi. I sorbetti sono naturalmente vegani.
+      I gusti <span style="color:var(--verde);font-weight:700;">🌾 GF</span> sono certificati senza glutine.
+    </p>
+    <div class="gusti-tabs reveal">
+      <button class="tab-btn active" onclick="filterGusti('tutti', this)">Tutti</button>
+      <button class="tab-btn" onclick="filterGusti('cremosi', this)">Cremosi al latte</button>
+      <button class="tab-btn" onclick="filterGusti('sorbetti', this)">Sorbetti alla frutta</button>
+      <button class="tab-btn" onclick="filterGusti('siciliani', this)">Tipici siciliani</button>
+      <button class="tab-btn" onclick="filterGusti('speciali', this)">Gusti speciali</button>
+      <button class="tab-btn" onclick="filterGusti('vegani', this)">Vegani</button>
+      <button class="tab-btn" onclick="filterGusti('gf', this)">🌾 Gluten Free</button>
+    </div>
+    <div class="gusti-grid" id="gusti-grid">
+      <!-- JS renderizza -->
+    </div>
+  </div>
+</section>
+
+<div class="maiolica-divider"></div>
+
+<!-- PREZZI -->
+<section id="prezzi">
+  <div class="section-inner">
+    <div class="section-label">Listino prezzi</div>
+    <h2 class="section-title reveal">Prezzi <em>onesti</em>, qualità artigianale</h2>
+    <div class="prezzi-grid">
+      <div class="prezzo-card reveal">
+        <div class="prezzo-icon">🥄</div>
+        <div class="prezzo-label">Coppetta piccola</div>
+        <div class="prezzo-desc">1 gusto · Ideale per una merenda</div>
+        <div class="prezzo-val">€ 2<small>.50</small></div>
+      </div>
+      <div class="prezzo-card featured reveal">
+        <div class="prezzo-icon">🍦</div>
+        <div class="prezzo-label">Coppetta media</div>
+        <div class="prezzo-desc">2 gusti · La più scelta</div>
+        <div class="prezzo-val">€ 3<small>.50</small></div>
+      </div>
+      <div class="prezzo-card reveal">
+        <div class="prezzo-icon">🍨</div>
+        <div class="prezzo-label">Coppetta grande</div>
+        <div class="prezzo-desc">3 gusti · Per veri appassionati</div>
+        <div class="prezzo-val">€ 4<small>.50</small></div>
+      </div>
+      <div class="prezzo-card reveal">
+        <div class="prezzo-icon">🍧</div>
+        <div class="prezzo-label">Vaschetta 500g</div>
+        <div class="prezzo-desc">Da portare a casa</div>
+        <div class="prezzo-val">€ 8<small>.00</small></div>
+      </div>
+      <div class="prezzo-card reveal">
+        <div class="prezzo-icon">🍫</div>
+        <div class="prezzo-label">Cannolo siciliano</div>
+        <div class="prezzo-desc">Farcito espresso al momento</div>
+        <div class="prezzo-val">€ 3<small>.00</small></div>
+      </div>
+      <div class="prezzo-card reveal">
+        <div class="prezzo-icon">🧁</div>
+        <div class="prezzo-label">Brioche col tuppo</div>
+        <div class="prezzo-desc">Con gelato · Colazione siciliana</div>
+        <div class="prezzo-val">€ 4<small>.50</small></div>
+      </div>
+      <div class="prezzo-card reveal">
+        <div class="prezzo-icon">☕</div>
+        <div class="prezzo-label">Granita + Brioche</div>
+        <div class="prezzo-desc">La vera colazione palermitana</div>
+        <div class="prezzo-val">€ 4<small>.00</small></div>
+      </div>
+      <div class="prezzo-card reveal">
+        <div class="prezzo-icon">🎂</div>
+        <div class="prezzo-label">Torta gelato</div>
+        <div class="prezzo-desc">Personalizzata · Da 6 persone</div>
+        <div class="prezzo-val">da € 25</div>
+      </div>
+    </div>
+    <p style="color:rgba(255,255,255,0.5);font-size:0.8rem;text-align:center;margin-top:2rem;">
+      * I prezzi possono variare. Contattaci per preventivi torte e ordini speciali.
+    </p>
+  </div>
+</section>
+
+<div class="maiolica-divider"></div>
+
+<!-- GLUTEN FREE -->
+<section id="glutenfree">
+  <div class="section-inner">
+    <div class="gf-hero reveal">
+      <div>
+        <div class="section-label" style="color:rgba(255,255,255,0.7);">Per chi ne ha bisogno</div>
+        <h2>🌾 Linea Gluten Free</h2>
+        <p>
+          Offriamo una selezione di gusti e prodotti certificati <strong>senza glutine</strong>, 
+          preparati con attenzione alla cross-contaminazione. 
+          I nostri sorbetti alla frutta sono naturalmente privi di glutine.
+          Chiedi sempre al personale per informazioni dettagliate sugli allergeni.
+        </p>
+      </div>
+      <div class="gf-badge-big">
+        <span class="gf-icon">🌾</span>
+        <span style="font-size:0.9rem;font-weight:700;">GLUTEN</span>
+        <span>FREE</span>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.5rem;" class="reveal">
+      <div class="info-card" style="background:white;border-color:#2d7a3a;">
+        <div class="info-card-icon">🍋</div>
+        <h3 style="color:#2d7a3a;">Sorbetti alla frutta</h3>
+        <p style="color:#445;">Limone, fragola, mango, lampone, arancia rossa, melone, frutti di bosco — tutti naturalmente GF.</p>
+      </div>
+      <div class="info-card" style="background:white;border-color:#2d7a3a;">
+        <div class="info-card-icon">🍫</div>
+        <h3 style="color:#2d7a3a;">Gelati cremosi GF</h3>
+        <p style="color:#445;">Cioccolato fondente, nocciola, pistacchio, stracciatella, fior di latte — verificati senza glutine.</p>
+      </div>
+      <div class="info-card" style="background:white;border-color:#2d7a3a;">
+        <div class="info-card-icon">🎂</div>
+        <h3 style="color:#2d7a3a;">Torte GF su ordinazione</h3>
+        <p style="color:#445;">Realizziamo torte gelato completamente gluten free su richiesta, con decorazioni personalizzate.</p>
+      </div>
+      <div class="info-card" style="background:white;border-color:#2d7a3a;">
+        <div class="info-card-icon">⚠️</div>
+        <h3 style="color:#2d7a3a;">Nota allergeni</h3>
+        <p style="color:#445;">Nonostante la cura, il laboratorio non è dedicato esclusivamente GF. In caso di celiachia severa, consultateci direttamente.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="maiolica-divider"></div>
+
+<!-- PASTICCERIA -->
+<section id="pasticceria" class="bg-pattern">
+  <div class="section-inner">
+    <div class="section-label">Dolci e pasticceria</div>
+    <h2 class="section-title reveal">Torte, cannoli e <em>prelibatezze</em> siciliane</h2>
+    <p class="reveal" style="max-width:600px;color:#445;font-weight:300;margin-bottom:0;line-height:1.7;">
+      Ogni dolce è un'opera artigianale. I cannoli vengono farciti al momento dell'acquisto per garantire la fragranza della cialda.
+    </p>
+    <div class="torte-grid">
+
+      <div class="torta-card reveal" style="--delay:0.1s">
+        <div class="torta-img" style="background:#3a1a5c;">🍰</div>
+        <div class="torta-body">
+          <h3>Torta Gelato Personalizzata</h3>
+          <p>Il fiore all'occhiello della pasticceria. Strati di gelato artigianale con decorazioni su misura per compleanni, lauree, anniversari e ogni occasione speciale.</p>
+          <div class="torta-tags">
+            <span class="torta-tag personalizzabile">Personalizzabile</span>
+            <span class="torta-tag">Da 6 persone</span>
+            <span class="torta-tag">48h anticipo</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="torta-card reveal" style="--delay:0.2s">
+        <div class="torta-img" style="background:#8b3a1a;">🥐</div>
+        <div class="torta-body">
+          <h3>Cannolo Siciliano</h3>
+          <p>Cialda fritta croccante farcita al momento con ricotta freschissima, scorza d'arancia candita, gocce di cioccolato e granella di pistacchio. 3€ l'uno.</p>
+          <div class="torta-tags">
+            <span class="torta-tag">Farcito al momento</span>
+            <span class="torta-tag">Ricetta originale</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="torta-card reveal" style="--delay:0.3s">
+        <div class="torta-img" style="background:#c9921a;">🧁</div>
+        <div class="torta-body">
+          <h3>Brioche col Tuppo</h3>
+          <p>La vera brioche siciliana, soffice e profumata, da abbinare al gelato o alla granita per la colazione più golosa che esista. La tradizione palermitana a Roma.</p>
+          <div class="torta-tags">
+            <span class="torta-tag">Colazione siciliana</span>
+            <span class="torta-tag">Fresca ogni mattina</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="torta-card reveal" style="--delay:0.4s">
+        <div class="torta-img" style="background:#2d5c2d;">🍋</div>
+        <div class="torta-body">
+          <h3>Granita Siciliana</h3>
+          <p>Limone, mandorla, caffè, fragola, pistacchio. Preparata con frutta fresca e zucchero, la granita è la quintessenza della Sicilia. Da gustare con brioche.</p>
+          <div class="torta-tags">
+            <span class="torta-tag gf-tag">Gluten Free</span>
+            <span class="torta-tag">Stagionale</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="torta-card reveal" style="--delay:0.5s">
+        <div class="torta-img" style="background:#1a5c7a;">🎂</div>
+        <div class="torta-body">
+          <h3>Semifreddo Artigianale</h3>
+          <p>Elegante come una torta, fresco come un gelato. Meringhe artigianali, cialde croccanti, granelle di frutta secca. L'ideale per chiudere in bellezza ogni cena.</p>
+          <div class="torta-tags">
+            <span class="torta-tag personalizzabile">Personalizzabile</span>
+            <span class="torta-tag">Da 4 persone</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="torta-card reveal" style="--delay:0.6s">
+        <div class="torta-img" style="background:#5c1a5c;">🍩</div>
+        <div class="torta-body">
+          <h3>Profiteroles al Gelato</h3>
+          <p>Bigné ripieni di gelato artigianale, ricoperti di cioccolato fondente siciliano. Una specialità che i clienti recensiscono come irresistibile.</p>
+          <div class="torta-tags">
+            <span class="torta-tag">Specialità della casa</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="maiolica-divider"></div>
+
+<!-- DOVE SIAMO -->
+<section id="dove-siamo">
+  <div class="section-inner">
+    <div class="section-label">Trovaci facilmente</div>
+    <h2 class="section-title reveal">Siamo a <em>L'Infernetto</em>, Roma</h2>
+    <div class="dove-grid">
+      <div class="indirizzo-info reveal">
+        <h3>Centro Commerciale Colombia</h3>
+        <div class="indirizzo-row">
+          <span class="ind-icon">📍</span>
+          <div class="ind-text">
+            <strong>Indirizzo</strong>
+            <span>Via Giambattista Bassani, 22–24<br>Infernetto, 00124 Roma (RM)</span>
+          </div>
+        </div>
+        <div class="indirizzo-row">
+          <span class="ind-icon">🏬</span>
+          <div class="ind-text">
+            <strong>Nel centro commerciale trovi anche</strong>
+            <span>Farmacia · Negozi abbigliamento · Palestra · Ristoranti · Forno · Scuola di inglese · Agenzia immobiliare</span>
+          </div>
+        </div>
+        <div class="indirizzo-row">
+          <span class="ind-icon">🚌</span>
+          <div class="ind-text">
+            <strong>Trasporto pubblico</strong>
+            <span>Autobus Roma TPL linee Infernetto – fermata "Colombia"</span>
+          </div>
+        </div>
+        <div class="indirizzo-row">
+          <span class="ind-icon">🅿️</span>
+          <div class="ind-text">
+            <strong>Parcheggio</strong>
+            <span>Gratuito e ampio nel piazzale del centro commerciale</span>
+          </div>
+        </div>
+        <a href="https://www.google.com/maps/dir/?api=1&destination=Via+Giambattista+Bassani+22+Roma+infernetto" target="_blank" class="btn-maps">
+          🗺️ Ottieni indicazioni
+        </a>
+      </div>
+      <div class="mappa-container reveal">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3000.9!2d12.3900!3d41.7550!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sVia+Giambattista+Bassani+22%2C+Roma!5e0!3m2!1sit!2sit!4v1600000000000!5m2!1sit!2sit"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Mappa Il Gelato di Barbara e Roberto"
+        ></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="maiolica-divider"></div>
+
+<!-- RECENSIONI -->
+<section id="recensioni" class="bg-pattern">
+  <div class="section-inner">
+    <div class="section-label">Cosa dicono di noi</div>
+    <h2 class="section-title reveal">⭐ 4.7/5 — <em>184+ recensioni</em></h2>
+    <div class="rec-grid">
+
+      <div class="rec-card reveal">
+        <div class="rec-stars stars">★★★★★</div>
+        <p class="rec-text">Tutto stupendo. Ho ordinato qui la torta di laurea, un gioiello a vedersi e da mangiarsi a dir poco. Barbara e Roberto sono straordinari.</p>
+        <div class="rec-author">
+          <div class="rec-avatar" style="background:#1a7abf;">A</div>
+          <div class="rec-author-info">
+            <strong>Alessandro M.</strong>
+            <span>Google · Maggio 2024</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rec-card reveal">
+        <div class="rec-stars stars">★★★★★</div>
+        <p class="rec-text">Gusti tipici siciliani eccezionali, dai fruttati ai classici ai più complessi. Il gusto mandorla è perfettamente equilibrato. Personale gentilissimo, sempre un afflusso di clienti!</p>
+        <div class="rec-author">
+          <div class="rec-avatar" style="background:#e87c2b;">M</div>
+          <div class="rec-author-info">
+            <strong>Maria G.</strong>
+            <span>TripAdvisor · 2024</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rec-card reveal">
+        <div class="rec-stars stars">★★★★★</div>
+        <p class="rec-text">I cannoli farciti al momento sono una meraviglia. La cialda rimane fragrante e il ripieno di ricotta è freschissimo. Granella di pistacchio da urlo. 3€ per questa qualità è incredibile!</p>
+        <div class="rec-author">
+          <div class="rec-avatar" style="background:#2d7a3a;">F</div>
+          <div class="rec-author-info">
+            <strong>Francesco L.</strong>
+            <span>Google · 2024</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rec-card reveal">
+        <div class="rec-stars stars">★★★★★</div>
+        <p class="rec-text">Eccezionale! Il gelato è favoloso, i pasticcini sempre freschi si sciolgono in bocca. Difficile trovare un equilibrio così buono tra qualità e prezzo a Roma.</p>
+        <div class="rec-author">
+          <div class="rec-avatar" style="background:#8b3a1a;">S</div>
+          <div class="rec-author-info">
+            <strong>Silvia R.</strong>
+            <span>Restaurant Guru · 2024</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rec-card reveal">
+        <div class="rec-stars stars">★★★★★</div>
+        <p class="rec-text">Gelateria di quartiere che non delude mai. Ogni stagione nuovi gusti con frutta fresca. Il semifreddo per il compleanno di mio figlio era spettacolare!</p>
+        <div class="rec-author">
+          <div class="rec-avatar" style="background:#6b3fa0;">L</div>
+          <div class="rec-author-info">
+            <strong>Laura P.</strong>
+            <span>Google · 2025</span>
+          </div>
+        </div>
+        </div>
+
+      <div class="rec-card reveal">
+        <div class="rec-stars stars">★★★★★</div>
+        <p class="rec-text">La brioche col tuppo abbinata alla granita di mandorla è la colazione più buona che ho fatto fuori dalla Sicilia. Ci torno ogni fine settimana con tutta la famiglia.</p>
+        <div class="rec-author">
+          <div class="rec-avatar" style="background:#c9921a;">C</div>
+          <div class="rec-author-info">
+            <strong>Carlo T.</strong>
+            <span>Google · 2025</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="maiolica-divider"></div>
+
+<!-- ORDINA / CONTATTI -->
+<section id="ordina">
+  <div class="section-inner">
+    <div class="section-label">Prenota la tua dolcezza</div>
+    <h2 class="section-title reveal">Ordina online o <em>contattaci</em></h2>
+    <div class="ordina-grid">
+      <div class="ordina-form reveal">
+        <h3 style="font-family:'Playfair Display',serif;color:white;margin-bottom:1.5rem;font-size:1.3rem;">Richiesta torta / ordine speciale</h3>
+        <div class="form-group">
+          <label class="form-label">Il tuo nome</label>
+          <input type="text" class="form-input" placeholder="Nome e cognome" id="f-nome">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Telefono o email</label>
+          <input type="text" class="form-input" placeholder="Per ricontattarti" id="f-contatto">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tipo di ordine</label>
+          <select class="form-select form-input" id="f-tipo">
+            <option value="">Seleziona...</option>
+            <option>Torta gelato personalizzata</option>
+            <option>Semifreddo</option>
+            <option>Vassoio cannoli</option>
+            <option>Torta Gluten Free</option>
+            <option>Vaschette gelato assortite</option>
+            <option>Altro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data desiderata</label>
+          <input type="date" class="form-input" id="f-data">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Dettagli e preferenze</label>
+          <textarea class="form-textarea form-input" placeholder="Gusti preferiti, decorazioni, numero persone, allergie..." id="f-note"></textarea>
+        </div>
+        <button class="form-submit" onclick="inviaOrdine()">🍰 Invia richiesta</button>
+      </div>
+      <div class="ordina-info reveal">
+        <h3>Ogni torta è un'opera d'arte unica</h3>
+        <p>
+          Le nostre torte gelato vengono realizzate a mano con cura artigianale. 
+          Ogni strato, ogni decorazione, ogni dettaglio è pensato per rendere 
+          il tuo momento speciale davvero indimenticabile.
+        </p>
+        <p>
+          Compila il modulo o contattaci direttamente. 
+          Ricordate: per le torte sono necessarie almeno <strong>48 ore di anticipo</strong>.
+        </p>
+        <div class="contatti-links">
+          <a href="tel:+39065678901" class="contatto-link">
+            <span>📞</span> Chiamaci direttamente
+          </a>
+          <a href="https://wa.me/39065678901" class="contatto-link" target="_blank">
+            <span>💬</span> Scrivici su WhatsApp
+          </a>
+          <a href="https://www.facebook.com/ilgelatodibarbaraeroberto" class="contatto-link" target="_blank">
+            <span>📘</span> Pagina Facebook ufficiale
+          </a>
+          <a href="https://www.ilgelatodibarbaraeroberto.it" class="contatto-link" target="_blank">
+            <span>🌐</span> Sito web ufficiale
+          </a>
+          <a href="https://www.google.com/maps/dir/?api=1&destination=Via+Giambattista+Bassani+22+Roma" target="_blank" class="contatto-link">
+            <span>🗺️</span> Indicazioni stradali
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-logo">Il Gelato di Barbara e Roberto</span>
+  <div class="footer-maiolica">
+    <div class="fm" style="background:#1a7abf;"></div>
+    <div class="fm" style="background:#f5c842;"></div>
+    <div class="fm" style="background:#2d7a3a;"></div>
+    <div class="fm" style="background:#e87c2b;"></div>
+    <div class="fm" style="background:#8b3a1a;"></div>
+    <div class="fm" style="background:#9b2d9b;"></div>
+    <div class="fm" style="background:#1a9abf;"></div>
+  </div>
+  <p>
+    Via Giambattista Bassani, 22–24 · Centro Commerciale Colombia · Infernetto, Roma<br>
+    Lunedì–Venerdì: 10:00–22:00 · Sabato–Domenica: 10:00–23:00<br>
+    <a href="https://www.ilgelatodibarbaraeroberto.it" target="_blank">www.ilgelatodibarbaraeroberto.it</a><br>
+    <br>
+    <small style="opacity:0.4;">Sito a scopo dimostrativo · © 2025 Il Gelato di Barbara e Roberto</small>
+  </p>
+</footer>
+
+<!-- TOAST -->
+<div id="toast">🍰 Richiesta inviata! Vi contatteremo presto.</div>
+
+<!-- FLOATING ACTIONS -->
+<div id="gelato-float">
+  <button class="float-btn" onclick="window.location='#ordina'" title="Ordina ora">🎂</button>
+  <button class="float-btn" onclick="window.location='#gusti'" title="Gusti">🍦</button>
+  <button class="float-btn" onclick="window.location='tel:+39065678901'" title="Chiama">📞</button>
+</div>
+
+<!-- THREE.JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════
+//  THREE.JS BACKGROUND — maioliche + gelati
+// ═══════════════════════════════════════════════
+(function() {
+  const canvas = document.getElementById('bg-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+  camera.position.z = 20;
+
+  // ── COLORI MAIOLICHE ──
+  const colors = [0x1a7abf, 0xf5c842, 0xe87c2b, 0x2d7a3a, 0x8b3a1a, 0x9b2d9b, 0x1a9abf, 0xd4a017];
+
+  // ── PIASTRELLE ESAGONALI fluttuanti ──
+  const hexTiles = [];
+  const hexGeo = new THREE.CylinderGeometry(0.6, 0.6, 0.08, 6);
+  for (let i = 0; i < 80; i++) {
+    const mat = new THREE.MeshPhongMaterial({
+      color: colors[Math.floor(Math.random() * colors.length)],
+      transparent: true,
+      opacity: 0.18 + Math.random() * 0.22,
+      shininess: 80
+    });
+    const mesh = new THREE.Mesh(hexGeo, mat);
+    mesh.position.set(
+      (Math.random() - 0.5) * 60,
+      (Math.random() - 0.5) * 60,
+      (Math.random() - 0.5) * 12 - 5
+    );
+    mesh.rotation.set(
+      Math.random() * Math.PI,
+      Math.random() * Math.PI,
+      Math.random() * Math.PI
+    );
+    mesh.userData = {
+      vx: (Math.random() - 0.5) * 0.008,
+      vy: (Math.random() - 0.5) * 0.006,
+      vz: (Math.random() - 0.5) * 0.003,
+      rx: (Math.random() - 0.5) * 0.008,
+      ry: (Math.random() - 0.5) * 0.01,
+    };
+    scene.add(mesh);
+    hexTiles.push(mesh);
+  }
+
+  // ── SFERE DECORATIVE (come palline di gelato) ──
+  const spheres = [];
+  const sphereColors = [0xffd700, 0xff8c42, 0x8b4513, 0xff69b4, 0x90ee90, 0xdda0dd];
+  for (let i = 0; i < 30; i++) {
+    const r = 0.15 + Math.random() * 0.5;
+    const geo = new THREE.SphereGeometry(r, 12, 12);
+    const mat = new THREE.MeshPhongMaterial({
+      color: sphereColors[Math.floor(Math.random() * sphereColors.length)],
+      transparent: true,
+      opacity: 0.12 + Math.random() * 0.18,
+      shininess: 120
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(
+      (Math.random() - 0.5) * 55,
+      (Math.random() - 0.5) * 55,
+      (Math.random() - 0.5) * 10 - 3
+    );
+    mesh.userData = {
+      vx: (Math.random() - 0.5) * 0.012,
+      vy: (Math.random() - 0.5) * 0.009,
+    };
+    scene.add(mesh);
+    spheres.push(mesh);
+  }
+
+  // ── PARTICELLE PICCOLE ──
+  const particleGeo = new THREE.BufferGeometry();
+  const pCount = 400;
+  const pPos = new Float32Array(pCount * 3);
+  for (let i = 0; i < pCount * 3; i++) {
+    pPos[i] = (Math.random() - 0.5) * 80;
+  }
+  particleGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+  const particleMat = new THREE.PointsMaterial({
+    color: 0xf5c842,
+    size: 0.06,
+    transparent: true,
+    opacity: 0.35
+  });
+  const particles = new THREE.Points(particleGeo, particleMat);
+  scene.add(particles);
+
+  // ── LUCI ──
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+  scene.add(ambientLight);
+  const dirLight1 = new THREE.DirectionalLight(0xf5c842, 0.8);
+  dirLight1.position.set(5, 5, 5);
+  scene.add(dirLight1);
+  const dirLight2 = new THREE.DirectionalLight(0x1a7abf, 0.5);
+  dirLight2.position.set(-5, -3, 3);
+  scene.add(dirLight2);
+
+  // ── MOUSE PARALLAX ──
+  let mouseX = 0, mouseY = 0;
+  document.addEventListener('mousemove', e => {
+    mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+    mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+  });
+
+  // ── SCROLL ──
+  let scrollY = 0;
+  window.addEventListener('scroll', () => { scrollY = window.scrollY; });
+
+  // ── RESIZE ──
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  let t = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    t += 0.008;
+
+    // Camera slight parallax
+    camera.position.x += (mouseX * 1.5 - camera.position.x) * 0.03;
+    camera.position.y += (-mouseY * 1.5 - camera.position.y) * 0.03;
+    camera.position.z = 20 - scrollY * 0.003;
+
+    // Tiles
+    hexTiles.forEach(tile => {
+      tile.position.x += tile.userData.vx;
+      tile.position.y += tile.userData.vy;
+      tile.position.z += tile.userData.vz;
+      tile.rotation.x += tile.userData.rx;
+      tile.rotation.y += tile.userData.ry;
+      // Wrap
+      if (Math.abs(tile.position.x) > 31) tile.userData.vx *= -1;
+      if (Math.abs(tile.position.y) > 31) tile.userData.vy *= -1;
+      if (tile.position.z > 3 || tile.position.z < -12) tile.userData.vz *= -1;
+    });
+
+    // Spheres
+    spheres.forEach((s, i) => {
+      s.position.x += s.userData.vx;
+      s.position.y += s.userData.vy + Math.sin(t + i * 0.5) * 0.004;
+      if (Math.abs(s.position.x) > 29) s.userData.vx *= -1;
+      if (Math.abs(s.position.y) > 29) s.userData.vy *= -1;
+    });
+
+    // Rotate particles slowly
+    particles.rotation.y = t * 0.05;
+    particles.rotation.x = t * 0.02;
+
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
+
+// ═══════════════════════════════════════════════
+//  GUSTI DATA
+// ═══════════════════════════════════════════════
+const gusti = [
+  { name: 'Pistacchio di Bronte', emoji: '🟢', cat: ['siciliani','cremosi'], color: '#2d7a3a', extra: '' },
+  { name: 'Mandorla Siciliana', emoji: '🤍', cat: ['siciliani','cremosi'], color: '#c9921a', extra: 'gf' },
+  { name: 'Nocciola Piemonte', emoji: '🟤', cat: ['cremosi'], color: '#8b5e3c', extra: 'gf' },
+  { name: 'Cioccolato Fondente', emoji: '🍫', cat: ['cremosi'], color: '#3b1f0f', extra: 'gf' },
+  { name: 'Stracciatella', emoji: '🖤', cat: ['cremosi'], color: '#555', extra: '' },
+  { name: 'Fior di Latte', emoji: '🥛', cat: ['cremosi'], color: '#aaa', extra: 'gf' },
+  { name: 'Caramello Salato', emoji: '🧂', cat: ['cremosi','speciali'], color: '#d4a017', extra: '' },
+  { name: 'Tiramisù', emoji: '☕', cat: ['cremosi','speciali'], color: '#6b3a1a', extra: '' },
+  { name: 'Cassata Siciliana', emoji: '🎂', cat: ['siciliani','speciali'], color: '#e87c2b', extra: '' },
+  { name: 'Ricotta e Fichi', emoji: '🍑', cat: ['siciliani'], color: '#9b2d9b', extra: '' },
+  { name: 'Torroncino', emoji: '🍬', cat: ['siciliani','cremosi'], color: '#c9921a', extra: '' },
+  { name: 'Fragola fresca', emoji: '🍓', cat: ['sorbetti'], color: '#e84040', extra: 'gf veg' },
+  { name: 'Limone Siciliano', emoji: '🍋', cat: ['sorbetti','siciliani'], color: '#d4c017', extra: 'gf veg' },
+  { name: 'Mango', emoji: '🥭', cat: ['sorbetti'], color: '#e87c2b', extra: 'gf veg' },
+  { name: 'Frutti di Bosco', emoji: '🫐', cat: ['sorbetti'], color: '#6b3fa0', extra: 'gf veg' },
+  { name: 'Arancia Rossa', emoji: '🍊', cat: ['sorbetti','siciliani'], color: '#cc4400', extra: 'gf veg' },
+  { name: 'Melone', emoji: '🍈', cat: ['sorbetti'], color: '#6a9a2a', extra: 'gf veg' },
+  { name: 'Lampone', emoji: '❤️', cat: ['sorbetti'], color: '#cc1155', extra: 'gf veg' },
+  { name: 'Cocco', emoji: '🥥', cat: ['sorbetti','vegani'], color: '#c9921a', extra: 'gf veg' },
+  { name: 'Cioccolato al Latte', emoji: '🍫', cat: ['cremosi'], color: '#8b5e3c', extra: '' },
+  { name: 'Panna cotta e fragole', emoji: '🍮', cat: ['speciali'], color: '#e84070', extra: '' },
+  { name: 'Fiore di Fico', emoji: '🌸', cat: ['siciliani','speciali'], color: '#7b3f9b', extra: 'gf' },
+  { name: 'Sesamo nero', emoji: '⚫', cat: ['siciliani','speciali'], color: '#222', extra: '' },
+  { name: 'Cioccolato vegano', emoji: '🌱', cat: ['vegani'], color: '#3b1f0f', extra: 'veg gf' },
+  { name: 'Latte di mandorla', emoji: '🌿', cat: ['vegani','siciliani'], color: '#c9921a', extra: 'veg gf' },
+  { name: 'Pistacchio vegano', emoji: '🌱', cat: ['vegani'], color: '#2d7a3a', extra: 'veg gf' },
+  { name: 'Granita Caffè', emoji: '☕', cat: ['siciliani'], color: '#3b1f0f', extra: 'gf' },
+  { name: 'Granita Mandorla', emoji: '🤍', cat: ['siciliani'], color: '#c9921a', extra: 'gf veg' },
+];
+
+function renderGusti(filter) {
+  const grid = document.getElementById('gusti-grid');
+  const list = filter === 'tutti' ? gusti :
+    filter === 'gf' ? gusti.filter(g => g.extra.includes('gf')) :
+    filter === 'vegani' ? gusti.filter(g => g.extra.includes('veg')) :
+    gusti.filter(g => g.cat.includes(filter));
+
+  grid.innerHTML = list.map(g => {
+    let tagHtml = '';
+    if (g.extra.includes('gf')) tagHtml += '<span class="gusto-tag gf">🌾 GF</span> ';
+    if (g.extra.includes('veg')) tagHtml += '<span class="gusto-tag veg">🌿 Vegano</span> ';
+    if (g.cat.includes('speciali')) tagHtml += '<span class="gusto-tag speciale">✦ Speciale</span>';
+    if (!tagHtml) tagHtml = '<span class="gusto-tag">Artigianale</span>';
+
+    return `<div class="gusto-card" style="--card-color:${g.color}" onclick="gustoClick('${g.name}')">
+      <span class="gusto-emoji">${g.emoji}</span>
+      <div class="gusto-name">${g.name}</div>
+      ${tagHtml}
+    </div>`;
+  }).join('');
+}
+
+function filterGusti(cat, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGusti(cat);
+}
+
+function gustoClick(name) {
+  showToast(`🍦 ${name} — da provare assolutamente!`);
+}
+
+renderGusti('tutti');
+
+// ═══════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function pulseTile(el) {
+  el.style.transform = 'scale(1.3) rotate(10deg)';
+  el.style.zIndex = '20';
+  setTimeout(() => {
+    el.style.transform = '';
+    el.style.zIndex = '';
+  }, 400);
+}
+
+function inviaOrdine() {
+  const nome = document.getElementById('f-nome').value.trim();
+  const contatto = document.getElementById('f-contatto').value.trim();
+  if (!nome || !contatto) {
+    showToast('⚠️ Inserisci nome e contatto!');
+    return;
+  }
+  showToast('🍰 Richiesta inviata! Vi contatteremo presto.');
+  document.getElementById('f-nome').value = '';
+  document.getElementById('f-contatto').value = '';
+  document.getElementById('f-note').value = '';
+}
+
+function toggleMenu() {
+  document.getElementById('nav-links').classList.toggle('open');
+}
+
+// ── OPEN BADGE dinamico ──
+(function() {
+  const now = new Date();
+  const day = now.getDay();
+  const hour = now.getHours();
+  const badge = document.getElementById('open-badge');
+  const isWeekend = (day === 0 || day === 6);
+  const closeHour = isWeekend ? 23 : 22;
+  const isOpen = hour >= 10 && hour < closeHour;
+  badge.textContent = isOpen ? 'Aperto ora' : 'Chiuso ora';
+  badge.style.background = isOpen ? '#2d7a3a' : '#c0392b';
+})();
+
+// ── REVEAL ON SCROLL ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ── NAV ACTIVE ──
+window.addEventListener('scroll', () => {
+  const sections = document.querySelectorAll('section[id]');
+  const links = document.querySelectorAll('.nav-links a');
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 100) current = s.id;
+  });
+  links.forEach(l => {
+    l.style.background = l.getAttribute('href') === '#' + current ? 'rgba(245,200,66,0.15)' : '';
+    l.style.color = l.getAttribute('href') === '#' + current ? 'var(--giallo)' : '';
+  });
+});
+</script>
+
+</body>
+</html>
