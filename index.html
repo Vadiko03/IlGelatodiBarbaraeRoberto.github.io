@@ -38,6 +38,22 @@ body {
   color: var(--blu);
   overflow-x: hidden;
   cursor: none;
+  scrollbar-width: thin;
+  scrollbar-color: var(--oro) var(--avorio);
+}
+::-webkit-scrollbar {
+  width: 12px;
+}
+::-webkit-scrollbar-track {
+  background: var(--avorio);
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--oro);
+  border-radius: 10px;
+  border: 3px solid var(--avorio);
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--arancio);
 }
 
 /* ─── CUSTOM CURSOR ─── */
@@ -61,12 +77,14 @@ body {
 }
 #cursor-dot {
   position: fixed;
-  width: 5px; height: 5px;
-  background: var(--oro-chiaro);
-  border-radius: 50%;
+  font-size: 28px;
   pointer-events: none;
   z-index: 100001;
-  transform: translate(-50%, -50%);
+  transform: translate(-10px, -5px); /* Offset to make the cone tip act as the actual click point */
+}
+#cursor-dot::after {
+  content: '🍦';
+  display: block;
 }
 .cursor-trail {
   position: fixed;
