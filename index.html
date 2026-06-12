@@ -3,14 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Il Gelato di Barbara e Roberto — Gelateria artigianale siciliana all'Infernetto, Roma. Oltre 40 gusti freschi ogni giorno, torte personalizzate, cannoli, pasticceria gluten free.">
 <title>Il Gelato di Barbara e Roberto – Infernetto, Roma</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════
    TOKEN SYSTEM
-   Display: Cormorant Garamond (elegante, siciliano)
-   Body:    Inter (leggibile, moderno)
-   Palette: blu notte · avorio · oro antico · terra arancio · verde oliva
+   Display: Cormorant Garamond
+   Body:    Inter
+   Palette: blu notte · avorio · oro · arancio · verde oliva
 ═══════════════════════════════════════════ */
 :root {
   --blu:    #0d1f35;
@@ -29,13 +30,66 @@
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: auto; /* We handle smooth scroll in JS */ }
 
 body {
   font-family: var(--font-body);
   background: var(--avorio);
   color: var(--blu);
   overflow-x: hidden;
+  cursor: none;
+}
+
+/* ─── CUSTOM CURSOR ─── */
+#custom-cursor {
+  position: fixed;
+  width: 18px; height: 18px;
+  border: 2px solid var(--oro-chiaro);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 100000;
+  transition: width 0.3s cubic-bezier(.23,1,.32,1), height 0.3s cubic-bezier(.23,1,.32,1),
+              border-color 0.3s, background 0.3s;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
+  background: transparent;
+}
+#custom-cursor.hover {
+  width: 48px; height: 48px;
+  background: rgba(232,184,75,0.15);
+  border-color: var(--oro);
+}
+#cursor-dot {
+  position: fixed;
+  width: 5px; height: 5px;
+  background: var(--oro-chiaro);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 100001;
+  transform: translate(-50%, -50%);
+}
+.cursor-trail {
+  position: fixed;
+  width: 6px; height: 6px;
+  background: var(--oro-chiaro);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99999;
+  opacity: 0.7;
+  animation: trailFade 0.6s ease-out forwards;
+}
+@keyframes trailFade {
+  to { opacity: 0; transform: scale(0.1) translate(-50%,-50%); }
+}
+
+/* Restore normal cursor on mobile */
+@media (max-width: 768px) {
+  body { cursor: auto; }
+  #custom-cursor, #cursor-dot, .cursor-trail { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body { cursor: auto; }
+  #custom-cursor, #cursor-dot, .cursor-trail { display: none !important; }
 }
 
 /* ─── CANVAS BG ─── */
@@ -47,14 +101,19 @@ body {
   pointer-events: none;
 }
 
-/* ─── NAV ─── */
+/* ─── NAV — Liquid Morphism ─── */
 nav {
   position: fixed;
   top: 0; width: 100%;
   z-index: 1000;
-  background: rgba(13,31,53,0.96);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(200,150,42,0.3);
+  background: rgba(13,31,53,0.92);
+  backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid rgba(200,150,42,0.2);
+  transition: all 0.5s cubic-bezier(.23,1,.32,1);
+}
+nav.scrolled {
+  background: rgba(13,31,53,0.97);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
 }
 .nav-inner {
   max-width: 1280px;
@@ -62,9 +121,11 @@ nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 68px;
+  height: 72px;
   padding: 0 2rem;
+  transition: height 0.5s cubic-bezier(.23,1,.32,1);
 }
+nav.scrolled .nav-inner { height: 54px; }
 .nav-logo {
   font-family: var(--font-display);
   font-size: 1.45rem;
@@ -75,11 +136,14 @@ nav {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  transition: font-size 0.4s;
 }
+nav.scrolled .nav-logo { font-size: 1.2rem; }
 .nav-links {
   display: flex;
   gap: 0.1rem;
   list-style: none;
+  position: relative;
 }
 .nav-links a {
   color: rgba(255,255,255,0.82);
@@ -90,9 +154,23 @@ nav {
   font-weight: 500;
   padding: 0.45rem 0.75rem;
   border-radius: 4px;
-  transition: color 0.2s, background 0.2s;
+  transition: color 0.3s, background 0.3s;
+  position: relative;
 }
 .nav-links a:hover { color: var(--oro-chiaro); }
+.nav-links a.active-link { color: var(--oro-chiaro); }
+
+/* Active indicator dot */
+#nav-indicator {
+  position: absolute;
+  bottom: -4px;
+  height: 3px;
+  background: var(--oro-chiaro);
+  border-radius: 2px;
+  transition: left 0.4s cubic-bezier(.23,1,.32,1), width 0.4s cubic-bezier(.23,1,.32,1);
+  box-shadow: 0 0 8px rgba(232,184,75,0.6);
+}
+
 .nav-cta {
   background: var(--oro) !important;
   color: white !important;
@@ -101,14 +179,30 @@ nav {
   font-weight: 600 !important;
 }
 .nav-cta:hover { background: var(--arancio) !important; }
+
+/* Hamburger — Animated SVG */
 #hamburger {
   display: none;
   background: none;
   border: none;
-  color: white;
-  font-size: 1.5rem;
   cursor: pointer;
+  width: 36px; height: 36px;
+  padding: 4px;
 }
+#hamburger svg {
+  width: 100%; height: 100%;
+}
+#hamburger .ham-line {
+  fill: none;
+  stroke: white;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: all 0.4s cubic-bezier(.23,1,.32,1);
+  transform-origin: center;
+}
+#hamburger.open .ham-line-1 { transform: rotate(45deg) translate(0, 0); }
+#hamburger.open .ham-line-2 { opacity: 0; }
+#hamburger.open .ham-line-3 { transform: rotate(-45deg) translate(0, 0); }
 
 /* ─── HERO ─── */
 #hero {
@@ -123,7 +217,7 @@ nav {
   padding: 110px 2rem 3rem;
   overflow: hidden;
 }
-/* immagine food in background */
+/* Background with animated color grading */
 #hero::before {
   content: '';
   position: absolute;
@@ -132,7 +226,52 @@ nav {
     linear-gradient(160deg, rgba(13,31,53,0.78) 0%, rgba(13,31,53,0.55) 50%, rgba(200,150,42,0.15) 100%),
     url('https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=1800&auto=format&fit=crop&q=80') center/cover no-repeat;
   z-index: -1;
+  animation: heroColorGrade 3.5s ease-out forwards;
 }
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.nav-logo-img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--oro);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), box-shadow 0.6s ease;
+}
+.nav-logo:hover .nav-logo-img {
+  transform: rotate(360deg) scale(1.1);
+  box-shadow: 0 0 15px rgba(200, 150, 42, 0.7);
+}
+@keyframes heroColorGrade {
+  0% { filter: hue-rotate(-20deg) saturate(0.6) brightness(0.7); }
+  100% { filter: hue-rotate(0deg) saturate(1.1) brightness(1); }
+}
+
+/* Animated warm gradient overlay */
+#hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg,
+    rgba(200,150,42,0.08) 0%,
+    transparent 40%,
+    rgba(217,107,42,0.06) 70%,
+    rgba(200,150,42,0.1) 100%);
+  z-index: -1;
+  animation: warmGlow 6s ease-in-out infinite alternate;
+}
+@keyframes warmGlow {
+  0% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
 .hero-eyebrow {
   font-family: var(--font-body);
   font-size: 0.72rem;
@@ -141,6 +280,8 @@ nav {
   color: var(--oro-chiaro);
   font-weight: 600;
   margin-bottom: 1.2rem;
+  opacity: 0;
+  animation: fadeInUp 0.8s ease-out 0.3s forwards;
 }
 .hero-title {
   font-family: var(--font-display);
@@ -150,6 +291,16 @@ nav {
   font-weight: 600;
   margin-bottom: 0.6rem;
   letter-spacing: -0.01em;
+  overflow: hidden;
+}
+.hero-title .letter {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(-80px) rotateX(90deg);
+  animation: letterDrop 0.6s cubic-bezier(.23,1,.32,1) forwards;
+}
+@keyframes letterDrop {
+  to { opacity: 1; transform: translateY(0) rotateX(0deg); }
 }
 .hero-title em {
   font-style: italic;
@@ -163,17 +314,23 @@ nav {
   font-weight: 400;
   margin-bottom: 2rem;
   letter-spacing: 0.02em;
+  opacity: 0;
+  animation: fadeInUp 0.8s ease-out 1.2s forwards;
 }
+
+/* Badge shimmer */
 .hero-badges {
   display: flex;
   gap: 0.6rem;
   justify-content: center;
   flex-wrap: wrap;
   margin-bottom: 2.8rem;
+  opacity: 0;
+  animation: fadeInUp 0.8s ease-out 1.5s forwards;
 }
 .badge {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.25);
   border-radius: 30px;
   padding: 0.35rem 1rem;
   font-size: 0.76rem;
@@ -181,14 +338,56 @@ nav {
   letter-spacing: 0.04em;
   backdrop-filter: blur(6px);
   font-weight: 500;
+  position: relative;
+  overflow: hidden;
 }
+.badge::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(232,184,75,0.3), transparent);
+  animation: shimmer 3s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+
 .hero-btns {
   display: flex;
   gap: 1rem;
   justify-content: center;
   flex-wrap: wrap;
+  opacity: 0;
+  animation: fadeInUp 0.8s ease-out 1.8s forwards;
 }
-.btn-primary {
+
+/* Count-up container */
+.hero-counter {
+  margin-top: 2rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.7);
+  opacity: 0;
+  animation: fadeInUp 0.8s ease-out 2.1s forwards;
+}
+.hero-counter .count-number {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--oro-chiaro);
+  display: inline-block;
+  margin: 0 0.3rem;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(25px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── BUTTONS ─── */
+.btn-primary, .btn-outline {
   background: var(--oro);
   color: white;
   border: none;
@@ -197,39 +396,34 @@ nav {
   font-size: 0.82rem;
   font-weight: 600;
   letter-spacing: 0.12em;
-  cursor: pointer;
+  cursor: none;
   text-decoration: none;
   transition: background 0.25s, transform 0.25s, box-shadow 0.25s;
   text-transform: uppercase;
   display: inline-block;
   font-family: var(--font-body);
+  position: relative;
+  overflow: hidden;
 }
-.btn-primary:hover {
+.btn-primary:hover, .btn-outline:hover {
   background: var(--arancio);
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(217,107,42,0.4);
 }
-.btn-outline {
-  background: var(--oro);
-  color: white;
-  border: none;
-  padding: 0.9rem 2.2rem;
-  border-radius: 4px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background 0.25s, transform 0.25s, box-shadow 0.25s;
-  text-transform: uppercase;
-  display: inline-block;
-  font-family: var(--font-body);
+
+/* Ripple effect */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.4);
+  transform: scale(0);
+  animation: rippleAnim 0.6s ease-out;
+  pointer-events: none;
 }
-.btn-outline:hover {
-  background: var(--arancio);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(217,107,42,0.4);
+@keyframes rippleAnim {
+  to { transform: scale(4); opacity: 0; }
 }
+
 .scroll-hint {
   position: absolute;
   bottom: 2.5rem;
@@ -252,18 +446,24 @@ nav {
   50%    { transform: translateX(-50%) translateY(7px); }
 }
 
-/* ─── STRIPES DIVIDER ─── */
-.stripe-divider {
-  height: 5px;
-  background: linear-gradient(90deg,
-    var(--blu) 0%, var(--blu) 20%,
-    var(--oro) 20%, var(--oro) 40%,
-    var(--arancio) 40%, var(--arancio) 60%,
-    var(--verde) 60%, var(--verde) 80%,
-    var(--terra) 80%, var(--terra) 100%
-  );
+/* ─── SVG WAVE DIVIDER ─── */
+.wave-divider {
   position: relative;
   z-index: 2;
+  height: 50px;
+  overflow: hidden;
+  line-height: 0;
+}
+.wave-divider svg {
+  display: block;
+  width: 200%;
+  height: 100%;
+  animation: waveSlide 8s linear infinite;
+}
+.wave-divider.reverse svg { animation-direction: reverse; }
+@keyframes waveSlide {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 /* ─── SECTION BASE ─── */
@@ -310,23 +510,55 @@ section { position: relative; z-index: 1; }
   font-weight: 400;
 }
 .storia-text p strong { color: var(--blu); font-weight: 600; }
-/* foto collage */
+
+/* Foto collage — 3D flip cards */
 .foto-collage {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 220px 220px;
   gap: 10px;
   border-radius: 8px;
+  overflow: visible;
+  perspective: 1000px;
+}
+.foto-card {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(.23,1,.32,1);
+  cursor: none;
+  border-radius: 8px;
   overflow: hidden;
 }
-.foto-collage img {
+.foto-card:hover { transform: rotateY(180deg); }
+.foto-card.span2 { grid-column: span 2; height: 180px; }
+.foto-card .card-front, .foto-card .card-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.foto-card .card-front img {
   width: 100%; height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.5s ease;
 }
-.foto-collage img:hover { transform: scale(1.04); }
-.foto-collage .span2 { grid-column: span 2; height: 180px; }
+.foto-card .card-back {
+  transform: rotateY(180deg);
+  background: linear-gradient(135deg, var(--blu), var(--blu2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  text-align: center;
+}
+.foto-card .card-back p {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-style: italic;
+  color: var(--oro-chiaro);
+  line-height: 1.6;
+}
 
 /* ─── INFO / ORARI ─── */
 #info { background: var(--blu); }
@@ -388,13 +620,13 @@ section { position: relative; z-index: 1; }
   color: white;
 }
 
-/* ─── GUSTI ─── */
+/* ─── GUSTI — Honeycomb Layout ─── */
 #gusti { background: var(--crema); }
 .gusti-tabs {
   display: flex;
   gap: 0.4rem;
   flex-wrap: wrap;
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.5rem;
   padding-bottom: 1.2rem;
   border-bottom: 1px solid rgba(13,31,53,0.12);
 }
@@ -417,48 +649,87 @@ section { position: relative; z-index: 1; }
   color: white;
   border-color: var(--blu);
 }
+
+/* Search bar */
+.gusti-search-wrap {
+  position: relative;
+  margin-bottom: 2rem;
+}
+.gusti-search {
+  width: 180px;
+  padding: 0.55rem 1rem 0.55rem 2.5rem;
+  border: 1.5px solid rgba(13,31,53,0.2);
+  border-radius: 30px;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  background: white;
+  color: var(--blu);
+  outline: none;
+  transition: width 0.5s cubic-bezier(.23,1,.32,1), border-color 0.3s, box-shadow 0.3s;
+}
+.gusti-search:focus {
+  width: 320px;
+  border-color: var(--oro);
+  box-shadow: 0 4px 20px rgba(200,150,42,0.15);
+}
+.gusti-search-icon {
+  position: absolute;
+  left: 0.85rem; top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.9rem;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Honeycomb grid */
 .gusti-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
   gap: 1rem;
 }
 .gusto-card {
   background: white;
-  border-radius: 8px;
-  padding: 1.4rem 1rem;
+  border-radius: 12px;
   text-align: center;
-  border: 1.5px solid transparent;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 1px 6px rgba(13,31,53,0.06);
+  transition: all 0.35s cubic-bezier(.23,1,.32,1);
+  box-shadow: 0 2px 12px rgba(13,31,53,0.07);
   position: relative;
   overflow: hidden;
-}
-.gusto-card::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 3px;
-  background: var(--card-color, var(--oro));
-  transform: scaleX(0);
-  transition: transform 0.3s;
+  display: flex;
+  flex-direction: column;
+  transform-style: preserve-3d;
+  will-change: transform;
 }
 .gusto-card:hover {
-  transform: translateY(-5px) scale(1.02);
-  border-color: rgba(13,31,53,0.1);
-  box-shadow: 0 10px 28px rgba(13,31,53,0.1);
+  box-shadow: 0 16px 40px rgba(13,31,53,0.15);
+  transform: translateY(-5px) scale(1.03);
 }
-.gusto-card:hover::after { transform: scaleX(1); }
-.gusto-emoji { font-size: 2.4rem; margin-bottom: 0.5rem; display: block; }
+/* Accent bar at top of card (replaces image) */
+.gusto-card-accent {
+  width: 100%;
+  height: 6px;
+  background: var(--card-color, var(--oro));
+  border-radius: 12px 12px 0 0;
+  flex-shrink: 0;
+}
+.gusto-card-body {
+  padding: 1.6rem 0.8rem 1.3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+.gusto-emoji { font-size: 2.2rem; margin-bottom: 0.4rem; display: block; }
 .gusto-name {
   font-family: var(--font-display);
-  font-size: 1rem;
+  font-size: 0.92rem;
   font-weight: 600;
   color: var(--blu);
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.2rem;
 }
 .gusto-tag {
-  font-size: 0.66rem;
+  font-size: 0.6rem;
   letter-spacing: 0.07em;
   text-transform: uppercase;
   color: #888;
@@ -468,7 +739,73 @@ section { position: relative; z-index: 1; }
 .gusto-tag.veg { color: #6b3fa0; }
 .gusto-tag.speciale { color: var(--arancio); }
 
-/* ─── PREZZI ─── */
+/* Gusto Modal */
+#gusto-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(13,31,53,0.6);
+  backdrop-filter: blur(12px);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+#gusto-modal.active { display: flex; opacity: 1; }
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  padding: 3rem;
+  max-width: 480px;
+  width: 90%;
+  text-align: center;
+  transform: scale(0.8);
+  transition: transform 0.5s cubic-bezier(.23,1,.32,1);
+  box-shadow: 0 32px 80px rgba(0,0,0,0.3);
+}
+#gusto-modal.active .modal-content { transform: scale(1); }
+/* Colored header for gusto modal */
+.modal-color-header {
+  margin: -3rem -3rem 1.5rem;
+  padding: 2.2rem 2rem 1.8rem;
+  border-radius: 16px 16px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(13,31,53,0.06);
+  transition: background 0.45s ease;
+}
+.modal-emoji { font-size: 4.5rem; margin: 0; line-height: 1; }
+.modal-name {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--blu);
+  margin-bottom: 0.5rem;
+}
+.modal-tags { margin-bottom: 1.5rem; }
+.modal-desc {
+  font-size: 0.9rem;
+  color: #556;
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+}
+.modal-close {
+  background: var(--blu);
+  color: white;
+  border: none;
+  padding: 0.6rem 2rem;
+  border-radius: 30px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.modal-close:hover { background: var(--arancio); }
+
+/* ─── PREZZI — Glassmorphism ─── */
 #prezzi { background: var(--blu2); }
 .prezzi-grid {
   display: grid;
@@ -477,20 +814,38 @@ section { position: relative; z-index: 1; }
   margin-top: 3rem;
 }
 .prezzo-card {
-  background: rgba(255,255,255,0.04);
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid rgba(200,150,42,0.2);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 1.8rem 1.4rem;
   text-align: center;
-  transition: all 0.3s;
+  transition: all 0.4s cubic-bezier(.23,1,.32,1);
   position: relative;
   overflow: hidden;
+  transform-style: preserve-3d;
 }
+.prezzo-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(200,150,42,0.3), transparent, rgba(232,184,75,0.2));
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.prezzo-card:hover::before { opacity: 1; }
 .prezzo-card.featured {
   border-color: var(--oro);
-  background: rgba(200,150,42,0.07);
+  background: rgba(200,150,42,0.08);
+  animation: featurePulse 3s ease-in-out infinite;
 }
-.prezzo-card.featured::before {
+@keyframes featurePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(200,150,42,0); }
+  50% { box-shadow: 0 0 30px 6px rgba(200,150,42,0.2); }
+}
+.prezzo-card.featured::after {
   content: '★ PIÙ SCELTO';
   position: absolute;
   top: 10px; right: -28px;
@@ -504,9 +859,9 @@ section { position: relative; z-index: 1; }
   font-family: var(--font-body);
 }
 .prezzo-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-6px) scale(1.02);
   border-color: var(--oro);
-  box-shadow: 0 14px 40px rgba(200,150,42,0.14);
+  box-shadow: 0 20px 50px rgba(200,150,42,0.18);
 }
 .prezzo-icon { font-size: 2.5rem; margin-bottom: 0.6rem; }
 .prezzo-label {
@@ -530,116 +885,116 @@ section { position: relative; z-index: 1; }
 }
 .prezzo-val small { font-size: 1.1rem; font-weight: 400; }
 
-/* ─── GLUTEN FREE ─── */
-#glutenfree { background: #f0f6f0; }
-.gf-banner {
-  background: linear-gradient(135deg, #2d5a2d 0%, #1a3d1a 100%);
-  border-radius: 10px;
-  padding: 3rem 3.5rem;
-  color: white;
+/* ─── GALLERY PREMIUM ─── */
+#gallery-premium {
+  background: var(--avorio);
+}
+.gallery-grid {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2rem;
-  align-items: center;
-  margin-bottom: 2.5rem;
+  margin-top: 2.5rem;
 }
-.gf-banner h2 {
-  font-family: var(--font-display);
-  font-size: 2.2rem;
-  font-weight: 600;
-  margin-bottom: 0.8rem;
+.gallery-item {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  box-shadow: 0 10px 30px rgba(13,31,53,0.06);
+  transition: transform 0.5s cubic-bezier(.23,1,.32,1), box-shadow 0.5s cubic-bezier(.23,1,.32,1);
 }
-.gf-banner p {
-  font-size: 0.95rem;
-  line-height: 1.75;
-  opacity: 0.85;
+.gallery-item:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(13,31,53,0.12);
 }
-.gf-emblem {
-  width: 110px; height: 110px;
-  border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.35);
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s cubic-bezier(.23,1,.32,1);
+}
+.gallery-item:hover img {
+  transform: scale(1.08);
+}
+.gallery-info {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(13,31,53,0.85) 0%, rgba(13,31,53,0.3) 50%, transparent 100%);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  background: rgba(255,255,255,0.08);
-}
-.gf-emblem .gf-icon { font-size: 2.4rem; }
-.gf-emblem span {
-  font-size: 0.65rem;
-  letter-spacing: 0.15em;
-  margin-top: 4px;
-  font-weight: 700;
-  font-family: var(--font-body);
-}
-.gf-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  gap: 1.2rem;
-}
-.gf-card {
-  background: white;
-  border: 1.5px solid rgba(42,100,42,0.2);
-  border-radius: 8px;
+  justify-content: flex-end;
   padding: 1.8rem;
-  transition: all 0.3s;
+  opacity: 0.9;
+  transition: opacity 0.3s;
 }
-.gf-card:hover { border-color: var(--verde); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(42,100,42,0.1); }
-.gf-card-icon { font-size: 2rem; margin-bottom: 0.8rem; }
-.gf-card h3 { font-family: var(--font-display); font-size: 1.15rem; color: var(--verde); margin-bottom: 0.5rem; font-weight: 600; }
-.gf-card p { font-size: 0.86rem; color: #445; line-height: 1.65; }
+.gallery-item:hover .gallery-info {
+  opacity: 1;
+}
+.gallery-info h3 {
+  font-family: var(--font-display);
+  color: var(--avorio);
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+.gallery-info p {
+  color: var(--oro-chiaro);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
 
 /* ─── PASTICCERIA ─── */
 #pasticceria { background: var(--avorio); }
-.pasticceria-hero-img {
-  width: 100%;
-  height: 340px;
-  object-fit: cover;
-  border-radius: 10px;
-  margin-bottom: 3rem;
-  display: block;
-}
-.torte-grid {
+.past3d-stage {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
   gap: 1.8rem;
 }
-.torta-card {
+.past3d-card {
   background: white;
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 2px 14px rgba(13,31,53,0.07);
-  transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  transition: box-shadow 0.3s ease, transform 0.15s ease-out;
   cursor: pointer;
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform;
 }
-.torta-card:hover {
-  transform: translateY(-7px);
-  box-shadow: 0 18px 44px rgba(13,31,53,0.14);
+.past3d-card:hover {
+  box-shadow: 0 18px 44px rgba(13,31,53,0.16);
 }
-.torta-img-real {
-  width: 100%; height: 180px;
+.past3d-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle 150px at var(--x, 0px) var(--y, 0px), rgba(255,255,255,0.22), transparent);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 5;
+}
+.past3d-card:hover::after { opacity: 1; }
+.past3d-card-img {
+  width: 100%; height: 200px;
   object-fit: cover;
   display: block;
 }
-.torta-img-emoji {
-  width: 100%; height: 160px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 4rem;
-}
-.torta-body { padding: 1.5rem; }
-.torta-body h3 {
+.past3d-body { padding: 1.5rem; }
+.past3d-body h3 {
   font-family: var(--font-display);
   font-size: 1.2rem;
   font-weight: 600;
   color: var(--blu);
   margin-bottom: 0.4rem;
 }
-.torta-body p { font-size: 0.86rem; color: #556; line-height: 1.65; margin-bottom: 1rem; }
-.torta-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; }
-.torta-tag {
+.past3d-body p { font-size: 0.86rem; color: #556; line-height: 1.65; margin-bottom: 1rem; }
+.past3d-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.past3d-tag {
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.07em;
@@ -651,8 +1006,8 @@ section { position: relative; z-index: 1; }
   border: 1px solid rgba(13,31,53,0.12);
   font-family: var(--font-body);
 }
-.torta-tag.personalizzabile { background: #fff3e0; color: #c05000; border-color: #c05000; }
-.torta-tag.gf-tag { background: #e8f5e9; color: var(--verde); border-color: var(--verde); }
+.past3d-tag.pers { background: #fff3e0; color: #c05000; border-color: #c05000; }
+.past3d-tag.sic { background: #e8f0ff; color: var(--blu2); border-color: var(--blu2); }
 
 /* ─── DOVE SIAMO ─── */
 #dove-siamo { background: var(--blu); }
@@ -797,71 +1152,133 @@ section { position: relative; z-index: 1; }
 #ordina { background: var(--terra); }
 #ordina .section-title-light { color: white; }
 .ordina-inner {
-  margin-top: 3rem;
+  margin-top: 3.5rem;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4rem;
-  align-items: start;
+  gap: 5rem;
+  align-items: center;
 }
 .ordina-text { color: white; }
 .ordina-text h3 {
   font-family: var(--font-display);
-  font-size: 1.8rem;
+  font-size: 2.2rem;
   font-style: italic;
   font-weight: 400;
+  color: var(--oro-chiaro);
   margin-bottom: 1.2rem;
-  opacity: 0.95;
 }
 .ordina-text p {
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   line-height: 1.8;
-  opacity: 0.82;
+  opacity: 0.9;
   margin-bottom: 1.5rem;
 }
 .contatti-links {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.2rem;
+  margin-top: 2.5rem;
 }
 .contatto-link {
   display: flex;
   align-items: center;
-  gap: 0.9rem;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 8px;
-  padding: 0.9rem 1.3rem;
+  justify-content: space-between;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-left: 4px solid var(--oro);
+  border-radius: 4px 12px 12px 4px;
+  padding: 1.2rem 1.5rem;
   color: white;
   text-decoration: none;
-  font-size: 0.88rem;
+  font-size: 1rem;
   font-weight: 500;
-  transition: all 0.25s;
+  transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+  backdrop-filter: blur(8px);
 }
-.contatto-link:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.4); }
-.contatto-link-icon { font-size: 1.3rem; }
+.contatto-link-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.contatto-link::after {
+  content: '→';
+  font-size: 1.4rem;
+  opacity: 0.3;
+  transition: all 0.35s ease;
+}
+.contatto-link:hover::after {
+  opacity: 1;
+  transform: translateX(5px);
+  color: var(--oro-chiaro);
+}
+.contatto-link:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.3);
+  border-left-color: var(--oro-chiaro);
+  transform: translateX(10px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+.contatto-link-icon { font-size: 1.6rem; }
 .ordina-img-block {
-  border-radius: 10px;
-  overflow: hidden;
   position: relative;
+  z-index: 1;
+  margin-top: 2rem;
 }
-.ordina-img-block img {
-  width: 100%; height: 380px;
+.ordina-img-block::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  bottom: 20px;
+  left: 20px;
+  border: 2px solid var(--oro);
+  border-radius: 16px;
+  z-index: -1;
+  transition: transform 0.5s ease;
+}
+.ordina-img-block:hover::before {
+  transform: translate(-10px, 10px);
+}
+.insta-slideshow {
+  width: 100%; height: 440px;
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+.insta-slideshow img {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   object-fit: cover;
-  display: block;
-  border-radius: 10px;
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
+}
+.insta-slideshow img.active {
+  opacity: 1;
 }
 .ordina-note {
   position: absolute;
-  bottom: 1.5rem; left: 1.5rem; right: 1.5rem;
-  background: rgba(13,31,53,0.85);
-  border-radius: 6px;
-  padding: 1rem 1.2rem;
-  color: white;
-  font-size: 0.83rem;
-  line-height: 1.6;
-  backdrop-filter: blur(4px);
+  bottom: -25px;
+  left: 5%;
+  width: 90%;
+  background: rgba(255, 255, 255, 0.97);
+  border-radius: 12px;
+  padding: 1.2rem 1.5rem;
+  color: var(--blu-scuro);
+  font-size: 0.95rem;
+  line-height: 1.4;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  backdrop-filter: blur(10px);
 }
-.ordina-note strong { color: var(--oro-chiaro); }
+.ordina-note-icon {
+  font-size: 2.2rem;
+  flex-shrink: 0;
+}
+.ordina-note strong { color: var(--arancio); font-weight: 700; }
 
 /* ─── TOAST ─── */
 #toast {
@@ -937,9 +1354,36 @@ footer a:hover { text-decoration: underline; }
 }
 .float-btn:hover { transform: scale(1.12) rotate(-6deg); background: var(--arancio); }
 
-/* ─── REVEAL ─── */
-.reveal { opacity: 0; transform: translateY(28px); transition: all 0.65s ease; }
-.reveal.visible { opacity: 1; transform: translateY(0); }
+/* ─── REVEAL ANIMATIONS (diversified) ─── */
+.reveal {
+  opacity: 0;
+  transition: all 0.7s cubic-bezier(.23,1,.32,1);
+}
+.reveal.from-left {
+  transform: translateX(-60px);
+}
+.reveal.from-right {
+  transform: translateX(60px);
+}
+.reveal.from-bottom {
+  transform: translateY(40px);
+}
+.reveal.from-scale {
+  transform: scale(0.85);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateX(0) translateY(0) scale(1);
+}
+
+/* Image reveal with clip-path */
+.img-reveal {
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.9s cubic-bezier(.23,1,.32,1);
+}
+.img-reveal.visible {
+  clip-path: inset(0 0% 0 0);
+}
 
 /* ─── MOBILE ─── */
 @media (max-width: 900px) {
@@ -947,40 +1391,67 @@ footer a:hover { text-decoration: underline; }
     display: none;
     flex-direction: column;
     position: absolute;
-    top: 68px; left: 0; right: 0;
+    top: 72px; left: 0; right: 0;
     background: rgba(13,31,53,0.98);
     padding: 1rem 2rem 2rem;
+    backdrop-filter: blur(20px);
   }
   .nav-links.open { display: flex; }
   .nav-links a { padding: 0.65rem 0; border-bottom: 1px solid rgba(255,255,255,0.07); border-radius: 0; }
   #hamburger { display: block; }
+  #nav-indicator { display: none; }
   #chi-siamo .content-grid { grid-template-columns: 1fr; gap: 2.5rem; }
   .dove-grid { grid-template-columns: 1fr; }
   .ordina-inner { grid-template-columns: 1fr; }
   .gf-banner { grid-template-columns: 1fr; }
   .gf-emblem { margin: 0 auto; }
   .foto-collage { grid-template-rows: 160px 160px; }
+  .gusto-card { clip-path: none; aspect-ratio: auto; border-radius: 8px; padding: 1.2rem 0.8rem; }
+  .gusti-search:focus { width: 100%; }
+  .wave-divider { height: 30px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal { opacity: 1; transform: none; }
+  .img-reveal { clip-path: none; }
 }
 </style>
 </head>
 <body>
+
+<div id="custom-cursor"></div>
+<div id="cursor-dot"></div>
 
 <canvas id="bg-canvas"></canvas>
 
 <!-- NAV -->
 <nav>
   <div class="nav-inner">
-    <a href="#hero" class="nav-logo">🍦 Barbara &amp; Roberto</a>
-    <button id="hamburger" onclick="toggleMenu()">☰</button>
+    <a href="#hero" class="nav-logo">
+      <img src="images/insta/insta47.jpg" alt="Logo" class="nav-logo-img">
+      <span>Barbara &amp; Roberto</span>
+    </a>
+    <button id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+      <svg viewBox="0 0 32 32">
+        <line class="ham-line ham-line-1" x1="6" y1="9" x2="26" y2="9"/>
+        <line class="ham-line ham-line-2" x1="6" y1="16" x2="26" y2="16"/>
+        <line class="ham-line ham-line-3" x1="6" y1="23" x2="26" y2="23"/>
+      </svg>
+    </button>
     <ul class="nav-links" id="nav-links">
       <li><a href="#chi-siamo">Chi siamo</a></li>
       <li><a href="#info">Orari</a></li>
       <li><a href="#gusti">Gusti</a></li>
       <li><a href="#prezzi">Prezzi</a></li>
-      <li><a href="#glutenfree">Gluten Free</a></li>
       <li><a href="#pasticceria">Pasticceria</a></li>
       <li><a href="#dove-siamo">Dove siamo</a></li>
       <li><a href="#ordina" class="nav-cta">Ordina ora</a></li>
+      <div id="nav-indicator"></div>
     </ul>
   </div>
 </nav>
@@ -988,8 +1459,8 @@ footer a:hover { text-decoration: underline; }
 <!-- HERO -->
 <section id="hero">
   <div class="hero-eyebrow">Artigianale · Siciliano · Infernetto, Roma</div>
-  <h1 class="hero-title">Il Gelato di<br><em>Barbara e Roberto</em></h1>
-  <p class="hero-subtitle">La dolcezza della Sicilia nel cuore di Roma</p>
+  <h1 class="hero-title" id="hero-title">Il Gelato di<br><em>Barbara e Roberto</em></h1>
+  <p class="hero-subtitle">Gelato artigianale siciliano, cannoli espressi e torte personalizzate all'Infernetto</p>
   <div class="hero-badges">
     <span class="badge">⭐ 4.7 su Google · 184 recensioni</span>
     <span class="badge">🍋 Gusti Siciliani</span>
@@ -1001,56 +1472,197 @@ footer a:hover { text-decoration: underline; }
     <a href="#gusti" class="btn-primary">Scopri i gusti</a>
     <a href="#ordina" class="btn-outline">Ordina una torta</a>
   </div>
+  <div class="hero-counter">
+    Oltre <span class="count-number" id="gusti-count" data-target="42">0</span> gusti disponibili oggi
+  </div>
   <div class="scroll-hint">
     <span>Scorri</span>
     <svg width="16" height="24" viewBox="0 0 16 24" fill="none"><rect x="5" y="1" width="6" height="12" rx="3" stroke="white" stroke-width="1.5"/><path d="M8 17l-4 5M8 17l4 5" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
   </div>
 </section>
 
-<div class="stripe-divider"></div>
+<!-- WAVE DIVIDER -->
+<div class="wave-divider">
+  <svg viewBox="0 0 1440 50" preserveAspectRatio="none">
+    <path d="M0,25 C120,45 240,5 360,25 C480,45 600,5 720,25 C840,45 960,5 1080,25 C1200,45 1320,5 1440,25 L1440,50 L0,50 Z" fill="var(--avorio)"/>
+    <path d="M1440,25 C1560,45 1680,5 1800,25 C1920,45 2040,5 2160,25 C2280,45 2400,5 2520,25 C2640,45 2760,5 2880,25 L2880,50 L1440,50 Z" fill="var(--avorio)"/>
+  </svg>
+</div>
 
-<!-- CHI SIAMO -->
-<section id="chi-siamo">
+<!-- GALLERY PREMIUM -->
+<section id="gallery-premium">
   <div class="section-inner">
-    <div class="content-grid">
-      <div class="storia-text reveal">
-        <div class="section-eyebrow">La nostra storia</div>
-        <h2 class="section-title">Una storia di <em>passione</em> e sapori autentici</h2>
-        <p>
-          <strong>Barbara e Roberto</strong> portano con sé la vera tradizione siciliana del gelato artigianale,
-          preparato ogni giorno con ingredienti freschi e selezionati. Situati nel <strong>Centro Commerciale Colombia</strong>
-          all'Infernetto, sono diventati un punto di riferimento imprescindibile per tutto il quartiere.
-        </p>
-        <p>
-          Il latte fresco proviene dai migliori allevamenti locali, la frutta di stagione è raccolta
-          al punto giusto di maturazione. Le paste di pistacchio, mandorla e nocciola arrivano
-          direttamente dai produttori siciliani più rinomati.
-        </p>
-        <p>
-          I cannoli vengono farciti <strong>espressi al momento</strong> per mantenere la fragranza della cialda.
-          Le torte gelato sono vere opere d'arte, personalizzabili per ogni occasione.
-          Con <strong>oltre 184 recensioni e 4.7 stelle</strong>, la qualità parla da sola.
-        </p>
-        <a href="#gusti" class="btn-primary" style="margin-top:1.5rem;">Esplora il menu →</a>
+    <div class="section-eyebrow reveal from-bottom">Le nostre specialità</div>
+    <h2 class="section-title reveal from-left">Un viaggio nei <em>sapori autentici</em></h2>
+    <div class="gallery-grid">
+      <div class="gallery-item reveal from-left">
+        <img src="images/banco_gelati.png" alt="Banco Gelati" loading="lazy">
+        <div class="gallery-info">
+          <h3>Banco Gelati</h3>
+          <p>Oltre 40 gusti freschi ogni giorno</p>
+        </div>
       </div>
-      <div class="foto-collage reveal">
-        <img src="https://img05.restaurantguru.com/rbf7-Il-gelato-di-Barbara-and-Roberto-food-2024-03-1.jpg" alt="Gelato artigianale colorato">
-        <img src="https://images.unsplash.com/photo-1580915411954-282cb1b0d780?w=600&auto=format&fit=crop&q=80" alt="Pistacchio e nocciola">
-        <img src="https://images.unsplash.com/photo-1488900128323-21503983a07e?w=1200&auto=format&fit=crop&q=80" alt="Coni di gelato artigianale" class="span2">
+      <div class="gallery-item reveal from-bottom">
+        <img src="images/cannoli.png" alt="Cannoli Siciliani" loading="lazy">
+        <div class="gallery-info">
+          <h3>Cannoli Siciliani</h3>
+          <p>Farciti espressi al momento</p>
+        </div>
+      </div>
+      <div class="gallery-item reveal from-right">
+        <img src="images/torte.png" alt="Torte Gelato" loading="lazy">
+        <div class="gallery-info">
+          <h3>Torte Gelato</h3>
+          <p>Creazioni uniche personalizzate</p>
+        </div>
+      </div>
+      <div class="gallery-item reveal from-left">
+        <img src="images/insta/insta21.jpg" alt="Barbara e Roberto" loading="lazy" style="object-position: center 20%;">
+        <div class="gallery-info">
+          <h3>Barbara e Roberto</h3>
+          <p>Passione e tradizione artigianale</p>
+        </div>
+      </div>
+      <div class="gallery-item reveal from-bottom">
+        <img src="images/locale.png" alt="Il nostro locale" loading="lazy">
+        <div class="gallery-info">
+          <h3>Il nostro locale</h3>
+          <p>Un'atmosfera calda e accogliente</p>
+        </div>
+      </div>
+      <div class="gallery-item reveal from-right">
+        <img src="images/granita_brioche.png" alt="Granita e Brioche" loading="lazy">
+        <div class="gallery-info">
+          <h3>Granita e Brioche</h3>
+          <p>La vera colazione siciliana</p>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<div class="stripe-divider"></div>
+<!-- CHI SIAMO -->
+<section id="chi-siamo">
+  <div class="section-inner">
+    <div class="content-grid">
+      <div class="storia-text reveal from-left">
+        <div class="section-eyebrow">La nostra storia</div>
+        <h2 class="section-title">Una storia di <em>passione</em> e sapori autentici</h2>
+        <p>
+          <strong>Barbara e Roberto</strong> portano all'Infernetto la vera tradizione del gelato siciliano, preparato ogni giorno con ingredienti freschi nel <strong>Centro Commerciale Colombia</strong>. Usiamo latte locale e materie prime d'eccellenza direttamente dalla Sicilia, come pistacchi e mandorle rinomati.
+        </p>
+        <p>
+          Gustate i nostri cannoli farciti <strong>espressi al momento</strong> e le torte gelato personalizzate per ogni occasione. Una passione per la qualità testimoniata da <strong>oltre 184 recensioni e 4.7 stelle</strong> su Google.
+        </p>
+        <a href="#gusti" class="btn-primary" style="margin-top:1.5rem;">Esplora il menu →</a>
+      </div>
+      <div class="foto-collage reveal from-right">
+        <div class="foto-card">
+          <div class="card-front"><img src="https://img05.restaurantguru.com/rbf7-Il-gelato-di-Barbara-and-Roberto-food-2024-03-1.jpg" alt="Gelato artigianale colorato"></div>
+          <div class="card-back"><p>«Ogni gusto è una ricetta di famiglia, perfezionata in anni di passione»</p></div>
+        </div>
+        <div class="foto-card">
+          <div class="card-front"><img src="https://images.unsplash.com/photo-1580915411954-282cb1b0d780?w=600&auto=format&fit=crop&q=80" alt="Pistacchio e nocciola"></div>
+          <div class="card-back"><p>«Pistacchio di Bronte e nocciola delle Langhe — il meglio d'Italia»</p></div>
+        </div>
+        <div class="foto-card span2">
+          <div class="card-front"><img src="https://images.unsplash.com/photo-1488900128323-21503983a07e?w=1200&auto=format&fit=crop&q=80" alt="Coni di gelato artigianale"></div>
+          <div class="card-back"><p>«Dal 2015 portiamo la Sicilia all'Infernetto, un cono alla volta»</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WAVE DIVIDER transition to Recensioni (crema) -->
+<div class="wave-divider reverse">
+  <svg viewBox="0 0 1440 50" preserveAspectRatio="none">
+    <path d="M0,25 C120,5 240,45 360,25 C480,5 600,45 720,25 C840,5 960,45 1080,25 C1200,5 1320,45 1440,25 L1440,50 L0,50 Z" fill="var(--crema)"/>
+    <path d="M1440,25 C1560,5 1680,45 1800,25 C1920,5 2040,45 2160,25 C2280,5 2400,45 2520,25 C2640,5 2760,45 2880,25 L2880,50 L1440,50 Z" fill="var(--crema)"/>
+  </svg>
+</div>
+
+<!-- RECENSIONI (moved here) -->
+<section id="recensioni">
+  <div class="section-inner">
+    <div class="section-eyebrow">Cosa dicono di noi</div>
+    <h2 class="section-title reveal from-left">Voci dei <em>clienti</em></h2>
+    <div class="rating-summary reveal from-bottom">
+      <div class="rating-big">4.7</div>
+      <div>
+        <div class="rating-stars">★★★★★</div>
+        <div style="font-size:0.82rem;color:var(--grigio);">Media su Google · TripAdvisor · Restaurant Guru</div>
+        <div class="rating-count" style="margin-top:3px;">184+ recensioni verificate</div>
+      </div>
+    </div>
+    <div class="rec-grid">
+      <div class="rec-card reveal from-left">
+        <div class="rec-stars">★★★★★</div>
+        <p class="rec-text">Tutto stupendo. Ho ordinato la torta di laurea: un gioiello a vedersi e da mangiarsi. Barbara e Roberto sono straordinari, curano ogni dettaglio con amore.</p>
+        <div class="rec-author">
+          <div class="rec-avatar" style="background:#1a4abf;">A</div>
+          <div class="rec-author-info"><strong>Alessandro M.</strong><span>Google · Maggio 2024</span></div>
+        </div>
+      </div>
+      <div class="rec-card reveal from-bottom">
+        <div class="rec-stars">★★★★★</div>
+        <p class="rec-text">Gusti tipici siciliani eccezionali, dai fruttati ai classici ai più complessi. Il gusto mandorla è perfettamente equilibrato. Personale gentilissimo!</p>
+        <div class="rec-author">
+          <div class="rec-avatar" style="background:#e87c2b;">M</div>
+          <div class="rec-author-info"><strong>Maria G.</strong><span>TripAdvisor · 2024</span></div>
+        </div>
+      </div>
+      <div class="rec-card reveal from-right">
+        <div class="rec-stars">★★★★★</div>
+        <p class="rec-text">I cannoli farciti al momento sono una meraviglia. La cialda rimane fragrante e il ripieno di ricotta espressa freschissimo. 3€ per questa qualità è incredibile!</p>
+        <div class="rec-author">
+          <div class="rec-avatar" style="background:#2d7a3a;">F</div>
+          <div class="rec-author-info"><strong>Francesco L.</strong><span>Google · 2024</span></div>
+        </div>
+      </div>
+      <div class="rec-card reveal from-scale">
+        <div class="rec-stars">★★★★★</div>
+        <p class="rec-text">Eccezionale! Il gelato è favoloso, i pasticcini si sciolgono in bocca. Difficile trovare un equilibrio così buono tra qualità e prezzo a Roma.</p>
+        <div class="rec-author">
+          <div class="rec-avatar" style="background:#8b3a1a;">S</div>
+          <div class="rec-author-info"><strong>Silvia R.</strong><span>Restaurant Guru · 2024</span></div>
+        </div>
+      </div>
+      <div class="rec-card reveal from-left">
+        <div class="rec-stars">★★★★★</div>
+        <p class="rec-text">Gelateria di quartiere che non delude mai. Ogni stagione nuovi gusti con frutta fresca. Il semifreddo per il compleanno di mio figlio era spettacolare!</p>
+        <div class="rec-author">
+          <div class="rec-avatar" style="background:#6b3fa0;">L</div>
+          <div class="rec-author-info"><strong>Laura P.</strong><span>Google · 2025</span></div>
+        </div>
+      </div>
+      <div class="rec-card reveal from-right">
+        <div class="rec-stars">★★★★★</div>
+        <p class="rec-text">La brioche col tuppo abbinata alla granita di mandorla è la colazione più buona fuori dalla Sicilia. Ci torno ogni fine settimana con tutta la famiglia.</p>
+        <div class="rec-author">
+          <div class="rec-avatar" style="background:#c9921a;">C</div>
+          <div class="rec-author-info"><strong>Carlo T.</strong><span>Google · 2025</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WAVE DIVIDER transition to Info (blu) -->
+<div class="wave-divider">
+  <svg viewBox="0 0 1440 50" preserveAspectRatio="none">
+    <path d="M0,25 C120,45 240,5 360,25 C480,45 600,5 720,25 C840,45 960,5 1080,25 C1200,45 1320,5 1440,25 L1440,50 L0,50 Z" fill="var(--blu)"/>
+    <path d="M1440,25 C1560,45 1680,5 1800,25 C1920,45 2040,5 2160,25 C2280,45 2400,5 2520,25 C2640,45 2760,5 2880,25 L2880,50 L1440,50 Z" fill="var(--blu)"/>
+  </svg>
+</div>
 
 <!-- ORARI E INFO -->
 <section id="info">
   <div class="section-inner">
     <div class="section-eyebrow">Dove e quando</div>
-    <h2 class="section-title section-title-light reveal">Informazioni <em>pratiche</em></h2>
+    <h2 class="section-title section-title-light reveal from-bottom">Informazioni <em>pratiche</em></h2>
     <div class="info-grid">
-      <div class="info-card reveal">
+      <div class="info-card reveal from-left">
         <div class="info-card-icon">🕐</div>
         <h3>Orari di apertura <span class="aperto-badge" id="open-badge">…</span></h3>
         <table class="orari-table">
@@ -1060,7 +1672,7 @@ footer a:hover { text-decoration: underline; }
         </table>
         <p style="margin-top:1rem;font-size:0.78rem;opacity:0.5;">Gli orari possono variare nei festivi.</p>
       </div>
-      <div class="info-card reveal">
+      <div class="info-card reveal from-bottom">
         <div class="info-card-icon">📍</div>
         <h3>Dove siamo</h3>
         <p>
@@ -1074,7 +1686,7 @@ footer a:hover { text-decoration: underline; }
           → Apri in Google Maps
         </a>
       </div>
-      <div class="info-card reveal">
+      <div class="info-card reveal from-right">
         <div class="info-card-icon">📞</div>
         <h3>Contatti</h3>
         <p>
@@ -1083,7 +1695,7 @@ footer a:hover { text-decoration: underline; }
           Ordini torte: almeno <strong style="color:var(--oro-chiaro);">48 ore</strong> di anticipo.
         </p>
       </div>
-      <div class="info-card reveal">
+      <div class="info-card reveal from-scale">
         <div class="info-card-icon">🚗</div>
         <h3>Come raggiungerci</h3>
         <p>
@@ -1095,18 +1707,27 @@ footer a:hover { text-decoration: underline; }
   </div>
 </section>
 
-<div class="stripe-divider"></div>
+<div class="wave-divider">
+  <svg viewBox="0 0 1440 50" preserveAspectRatio="none">
+    <path d="M0,25 C120,45 240,5 360,25 C480,45 600,5 720,25 C840,45 960,5 1080,25 C1200,45 1320,5 1440,25 L1440,50 L0,50 Z" fill="var(--crema)"/>
+    <path d="M1440,25 C1560,45 1680,5 1800,25 C1920,45 2040,5 2160,25 C2280,45 2400,5 2520,25 C2640,45 2760,5 2880,25 L2880,50 L1440,50 Z" fill="var(--crema)"/>
+  </svg>
+</div>
 
 <!-- GUSTI -->
 <section id="gusti">
   <div class="section-inner">
     <div class="section-eyebrow">Il nostro gelato</div>
-    <h2 class="section-title reveal">I gusti del <em>giorno</em></h2>
-    <p class="reveal" style="max-width:580px;color:#445;line-height:1.75;margin-bottom:2rem;">
+    <h2 class="section-title reveal from-left">I gusti del <em>giorno</em></h2>
+    <p class="reveal from-bottom" style="max-width:580px;color:#445;line-height:1.75;margin-bottom:1.5rem;">
       Tutti i gusti sono preparati ogni mattina con ingredienti freschi. I sorbetti sono naturalmente vegani.
       I gusti <strong style="color:var(--verde);">🌾 GF</strong> sono senza glutine.
     </p>
-    <div class="gusti-tabs reveal">
+    <div class="gusti-search-wrap reveal from-right">
+      <span class="gusti-search-icon">🔍</span>
+      <input type="text" class="gusti-search" id="gusti-search" placeholder="Cerca un gusto…" autocomplete="off">
+    </div>
+    <div class="gusti-tabs reveal from-bottom">
       <button class="tab-btn active" onclick="filterGusti('tutti',this)">Tutti</button>
       <button class="tab-btn" onclick="filterGusti('cremosi',this)">Cremosi</button>
       <button class="tab-btn" onclick="filterGusti('speciali',this)">Speciali</button>
@@ -1120,124 +1741,79 @@ footer a:hover { text-decoration: underline; }
   </div>
 </section>
 
-<div class="stripe-divider"></div>
+<div class="wave-divider reverse">
+  <svg viewBox="0 0 1440 50" preserveAspectRatio="none">
+    <path d="M0,25 C120,5 240,45 360,25 C480,5 600,45 720,25 C840,5 960,45 1080,25 C1200,5 1320,45 1440,25 L1440,50 L0,50 Z" fill="var(--blu2)"/>
+    <path d="M1440,25 C1560,5 1680,45 1800,25 C1920,5 2040,45 2160,25 C2280,5 2400,45 2520,25 C2640,5 2760,45 2880,25 L2880,50 L1440,50 Z" fill="var(--blu2)"/>
+  </svg>
+</div>
 
 <!-- PREZZI -->
 <section id="prezzi">
   <div class="section-inner">
     <div class="section-eyebrow">Listino prezzi</div>
-    <h2 class="section-title section-title-light reveal">Prezzi <em>onesti</em>, qualità artigianale</h2>
+    <h2 class="section-title section-title-light reveal from-bottom">Prezzi <em>onesti</em>, qualità artigianale</h2>
     <div class="prezzi-grid">
-      <div class="prezzo-card reveal"><div class="prezzo-icon">🍦</div><div class="prezzo-label">Cono Piccolo</div><div class="prezzo-val">€ 3<small>.00</small></div></div>
-      <div class="prezzo-card featured reveal"><div class="prezzo-icon">🍦</div><div class="prezzo-label">Cono Medio</div><div class="prezzo-val">€ 3<small>.50</small></div></div>
-      <div class="prezzo-card reveal"><div class="prezzo-icon">🍦</div><div class="prezzo-label">Cono Grande</div><div class="prezzo-val">€ 4<small>.00</small></div></div>
-      <div class="prezzo-card reveal"><div class="prezzo-icon">🍦</div><div class="prezzo-label">Cono XL</div><div class="prezzo-val">€ 6<small>.00</small></div></div>
-      <div class="prezzo-card reveal"><div class="prezzo-icon">🌾</div><div class="prezzo-label">Cono Senza Glutine</div><div class="prezzo-val">€ 4<small>.00</small></div></div>
-      <div class="prezzo-card reveal"><div class="prezzo-icon">🍫</div><div class="prezzo-label">Cannolo</div><div class="prezzo-val">€ 3<small>.00</small></div></div>
-      <div class="prezzo-card reveal"><div class="prezzo-icon">🧁</div><div class="prezzo-label">Brioche col Tuppo</div><div class="prezzo-val">€ 6<small>.00</small></div></div>
-      <div class="prezzo-card reveal"><div class="prezzo-icon">🍦</div><div class="prezzo-label">Vaschette/panna</div><div class="prezzo-val">€ 28<small>.00</small></div></div>
-      <div class="prezzo-card reveal"><div class="prezzo-icon">🍧</div><div class="prezzo-label">Granita / Frappé</div><div class="prezzo-val">€ 3<small>.50</small></div></div>
-      <div class="prezzo-card reveal"><div class="prezzo-icon">🎂</div><div class="prezzo-label">Torte (al kg)</div><div class="prezzo-val">€ 32</div></div>
-      <div class="prezzo-card reveal"><div class="prezzo-icon">🥣</div><div class="prezzo-label">Yogurt</div><div class="prezzo-val">€ 3–4<small>.50</small></div></div>
-      <div class="prezzo-card reveal"><div class="prezzo-icon">🍓</div><div class="prezzo-label">Frutta Realistica</div><div class="prezzo-val">€ 8<small>.00</small></div></div>
+      <div class="prezzo-card reveal from-left"><div class="prezzo-icon">🍦</div><div class="prezzo-label">Cono Piccolo</div><div class="prezzo-val" data-price="3.00">€ 3<small>.00</small></div></div>
+      <div class="prezzo-card featured reveal from-bottom"><div class="prezzo-icon">🍦</div><div class="prezzo-label">Cono Medio</div><div class="prezzo-val" data-price="3.50">€ 3<small>.50</small></div></div>
+      <div class="prezzo-card reveal from-right"><div class="prezzo-icon">🍦</div><div class="prezzo-label">Cono Grande</div><div class="prezzo-val" data-price="4.00">€ 4<small>.00</small></div></div>
+      <div class="prezzo-card reveal from-left"><div class="prezzo-icon">🍦</div><div class="prezzo-label">Cono XL</div><div class="prezzo-val" data-price="6.00">€ 6<small>.00</small></div></div>
+      <div class="prezzo-card reveal from-bottom"><div class="prezzo-icon">🌾</div><div class="prezzo-label">Cono Senza Glutine</div><div class="prezzo-val" data-price="4.00">€ 4<small>.00</small></div></div>
+      <div class="prezzo-card reveal from-right"><div class="prezzo-icon">🍫</div><div class="prezzo-label">Cannolo</div><div class="prezzo-val" data-price="3.00">€ 3<small>.00</small></div></div>
+      <div class="prezzo-card reveal from-left"><div class="prezzo-icon">🧁</div><div class="prezzo-label">Brioche col Tuppo</div><div class="prezzo-val" data-price="6.00">€ 6<small>.00</small></div></div>
+      <div class="prezzo-card reveal from-bottom"><div class="prezzo-icon">🍦</div><div class="prezzo-label">Vaschette/panna</div><div class="prezzo-val" data-price="28.00">€ 28<small>.00</small></div></div>
+      <div class="prezzo-card reveal from-right"><div class="prezzo-icon">🍧</div><div class="prezzo-label">Granita / Frappé</div><div class="prezzo-val" data-price="3.50">€ 3<small>.50</small></div></div>
+      <div class="prezzo-card reveal from-scale"><div class="prezzo-icon">🎂</div><div class="prezzo-label">Torte (al kg)</div><div class="prezzo-val" data-price="32">€ 32</div></div>
+      <div class="prezzo-card reveal from-left"><div class="prezzo-icon">🥣</div><div class="prezzo-label">Yogurt</div><div class="prezzo-val">€ 3–4<small>.50</small></div></div>
+      <div class="prezzo-card reveal from-right"><div class="prezzo-icon">🍓</div><div class="prezzo-label">Frutta Realistica</div><div class="prezzo-val" data-price="8.00">€ 8<small>.00</small></div></div>
     </div>
   </div>
 </section>
 
-<div class="stripe-divider"></div>
-
-<!-- GLUTEN FREE -->
-<section id="glutenfree">
-  <div class="section-inner">
-    <div class="gf-banner reveal">
-      <div>
-        <div class="section-eyebrow" style="color:rgba(255,255,255,0.65);">Per chi ne ha bisogno</div>
-        <h2>🌾 Linea Gluten Free</h2>
-        <p>
-          Offriamo una selezione di gusti e prodotti certificati <strong>senza glutine</strong>,
-          preparati con attenzione alla cross-contaminazione.
-          I sorbetti alla frutta sono naturalmente privi di glutine.
-          Chiedi sempre al personale per informazioni sugli allergeni.
-        </p>
-      </div>
-      <div class="gf-emblem">
-        <span class="gf-icon">🌾</span>
-        <span>GLUTEN</span>
-        <span>FREE</span>
-      </div>
-    </div>
-    <div class="gf-grid reveal">
-      <div class="gf-card">
-        <div class="gf-card-icon">🍋</div>
-        <h3>Sorbetti alla frutta</h3>
-        <p>Limone, fragola, mango, lampone, arancia rossa, melone, frutti di bosco — tutti naturalmente GF.</p>
-      </div>
-      <div class="gf-card">
-        <div class="gf-card-icon">🍫</div>
-        <h3>Gelati cremosi GF</h3>
-        <p>Cioccolato fondente, nocciola, pistacchio, stracciatella, fior di latte — verificati senza glutine.</p>
-      </div>
-      <div class="gf-card">
-        <div class="gf-card-icon">🎂</div>
-        <h3>Torte GF su ordinazione</h3>
-        <p>Realizziamo torte gelato completamente gluten free su richiesta, con decorazioni personalizzate.</p>
-      </div>
-      <div class="gf-card">
-        <div class="gf-card-icon">⚠️</div>
-        <h3>Nota allergeni</h3>
-        <p>Il laboratorio non è dedicato esclusivamente GF. In caso di celiachia severa, consultateci direttamente.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="stripe-divider"></div>
+<div class="wave-divider">
+  <svg viewBox="0 0 1440 50" preserveAspectRatio="none">
+    <path d="M0,25 C120,45 240,5 360,25 C480,45 600,5 720,25 C840,45 960,5 1080,25 C1200,45 1320,5 1440,25 L1440,50 L0,50 Z" fill="var(--avorio)"/>
+    <path d="M1440,25 C1560,45 1680,5 1800,25 C1920,45 2040,5 2160,25 C2280,45 2400,5 2520,25 C2640,45 2760,5 2880,25 L2880,50 L1440,50 Z" fill="var(--avorio)"/>
+  </svg>
+</div>
 
 <!-- PASTICCERIA -->
 <section id="pasticceria">
   <div class="section-inner">
     <div class="section-eyebrow">Dolci e pasticceria</div>
-    <h2 class="section-title reveal">Torte, cannoli e <em>prelibatezze</em> siciliane</h2>
-    <img
-      src="https://images.unsplash.com/photo-1551024601-bec78aea704b?w=1400&auto=format&fit=crop&q=80"
-      alt="Pasticceria siciliana — cannoli e dolci"
-      class="pasticceria-hero-img reveal"
-    >
-    <div class="torte-grid">
-      <div class="torta-card reveal">
-        <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&auto=format&fit=crop&q=80"
-          alt="Torta gelato personalizzata" class="torta-img-real">
-        <div class="torta-body">
+    <h2 class="section-title reveal from-left">Torte, cannoli e <em>prelibatezze</em> siciliane</h2>
+    <div class="past3d-stage">
+      <div class="past3d-card reveal from-left">
+        <img src="images/torte.png" alt="Torta gelato personalizzata" class="past3d-card-img">
+        <div class="past3d-body">
           <h3>Torta Gelato Personalizzata</h3>
           <p>Strati di gelato artigianale con decorazioni su misura per compleanni, lauree, anniversari e ogni occasione speciale.</p>
-          <div class="torta-tags">
-            <span class="torta-tag personalizzabile">Personalizzabile</span>
-            <span class="torta-tag">Da 6 persone</span>
-            <span class="torta-tag">48h anticipo</span>
+          <div class="past3d-tags">
+            <span class="past3d-tag pers">Personalizzabile</span>
+            <span class="past3d-tag">Da 6 persone</span>
+            <span class="past3d-tag">48h anticipo</span>
           </div>
         </div>
       </div>
-      <div class="torta-card reveal">
-        <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2d/3a/3d/60/caption.jpg?w=900&h=500&s=1"
-          alt="Cannolo siciliano" class="torta-img-real">
-        <div class="torta-body">
+      <div class="past3d-card reveal from-bottom">
+        <img src="images/cannoli.png" alt="Cannolo siciliano" class="past3d-card-img">
+        <div class="past3d-body">
           <h3>Cannolo Siciliano</h3>
           <p>Cialda fritta croccante farcita al momento con ricotta freschissima, scorza d'arancia candita e granella di pistacchio. 3€ l'uno.</p>
-          <div class="torta-tags">
-            <span class="torta-tag">Farcito al momento</span>
-            <span class="torta-tag">Ricetta originale</span>
+          <div class="past3d-tags">
+            <span class="past3d-tag sic">Farcito al momento</span>
+            <span class="past3d-tag">Ricetta originale</span>
           </div>
         </div>
       </div>
-      <div class="torta-card reveal">
-        <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2d/3a/3d/62/caption.jpg?w=900&h=500&s=1"
-          alt="Brioche col tuppo" class="torta-img-real">
-        <div class="torta-body">
+      <div class="past3d-card reveal from-right">
+        <img src="images/granita_brioche.png" alt="Brioche col tuppo" class="past3d-card-img">
+        <div class="past3d-body">
           <h3>Brioche col Tuppo</h3>
           <p>La vera brioche siciliana, soffice e profumata, da abbinare al gelato o alla granita per la colazione più golosa che esista.</p>
-          <div class="torta-tags">
-            <span class="torta-tag">Colazione siciliana</span>
-            <span class="torta-tag">Fresca ogni mattina</span>
+          <div class="past3d-tags">
+            <span class="past3d-tag sic">Colazione siciliana</span>
+            <span class="past3d-tag">Fresca ogni mattina</span>
           </div>
         </div>
       </div>
@@ -1245,24 +1821,29 @@ footer a:hover { text-decoration: underline; }
   </div>
 </section>
 
-<div class="stripe-divider"></div>
+<div class="wave-divider">
+  <svg viewBox="0 0 1440 50" preserveAspectRatio="none">
+    <path d="M0,25 C120,45 240,5 360,25 C480,45 600,5 720,25 C840,45 960,5 1080,25 C1200,45 1320,5 1440,25 L1440,50 L0,50 Z" fill="var(--blu)"/>
+    <path d="M1440,25 C1560,45 1680,5 1800,25 C1920,45 2040,5 2160,25 C2280,45 2400,5 2520,25 C2640,45 2760,5 2880,25 L2880,50 L1440,50 Z" fill="var(--blu)"/>
+  </svg>
+</div>
 
 <!-- DOVE SIAMO -->
 <section id="dove-siamo">
   <div class="section-inner">
     <div class="section-eyebrow">Trovaci facilmente</div>
-    <h2 class="section-title section-title-light reveal">Siamo a <em>L'Infernetto</em>, Roma</h2>
+    <h2 class="section-title section-title-light reveal from-bottom">Siamo a <em>L'Infernetto</em>, Roma</h2>
     <div class="dove-grid">
-      <div class="mappa-container reveal">
+      <div class="mappa-container reveal from-left">
         <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3000.9!2d12.3900!3d41.7550!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sVia+Giambattista+Bassani+22%2C+Roma!5e0!3m2!1sit!2sit!4v1600000000000!5m2!1sit!2sit"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2979.645366479704!2d12.361541276587428!3d41.74918237124479!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x13258becb661d9a3%3A0xe5a3bb4054a10df7!2sIl%20Gelato%20di%20Barbara%20%26%20Roberto!5e0!3m2!1sit!2sit!4v1718182107000!5m2!1sit!2sit"
           allowfullscreen=""
           loading="lazy"
           referrerpolicy="no-referrer-when-downgrade"
           title="Mappa Il Gelato di Barbara e Roberto"
         ></iframe>
       </div>
-      <div class="indirizzo-info reveal">
+      <div class="indirizzo-info reveal from-right">
         <h3>Centro Commerciale Colombia</h3>
         <div class="indirizzo-row">
           <span class="ind-icon">📍</span>
@@ -1294,111 +1875,73 @@ footer a:hover { text-decoration: underline; }
   </div>
 </section>
 
-<div class="stripe-divider"></div>
-
-<!-- RECENSIONI -->
-<section id="recensioni">
-  <div class="section-inner">
-    <div class="section-eyebrow">Cosa dicono di noi</div>
-    <h2 class="section-title reveal">Voci dei <em>clienti</em></h2>
-    <div class="rating-summary reveal">
-      <div class="rating-big">4.7</div>
-      <div>
-        <div class="rating-stars">★★★★★</div>
-        <div style="font-size:0.82rem;color:var(--grigio);">Media su Google · TripAdvisor · Restaurant Guru</div>
-        <div class="rating-count" style="margin-top:3px;">184+ recensioni verificate</div>
-      </div>
-    </div>
-    <div class="rec-grid">
-      <div class="rec-card reveal">
-        <div class="rec-stars">★★★★★</div>
-        <p class="rec-text">Tutto stupendo. Ho ordinato la torta di laurea: un gioiello a vedersi e da mangiarsi. Barbara e Roberto sono straordinari, curano ogni dettaglio con amore.</p>
-        <div class="rec-author">
-          <div class="rec-avatar" style="background:#1a4abf;">A</div>
-          <div class="rec-author-info"><strong>Alessandro M.</strong><span>Google · Maggio 2024</span></div>
-        </div>
-      </div>
-      <div class="rec-card reveal">
-        <div class="rec-stars">★★★★★</div>
-        <p class="rec-text">Gusti tipici siciliani eccezionali, dai fruttati ai classici ai più complessi. Il gusto mandorla è perfettamente equilibrato. Personale gentilissimo!</p>
-        <div class="rec-author">
-          <div class="rec-avatar" style="background:#e87c2b;">M</div>
-          <div class="rec-author-info"><strong>Maria G.</strong><span>TripAdvisor · 2024</span></div>
-        </div>
-      </div>
-      <div class="rec-card reveal">
-        <div class="rec-stars">★★★★★</div>
-        <p class="rec-text">I cannoli farciti al momento sono una meraviglia. La cialda rimane fragrante e il ripieno di ricotta freschissimo. 3€ per questa qualità è incredibile!</p>
-        <div class="rec-author">
-          <div class="rec-avatar" style="background:#2d7a3a;">F</div>
-          <div class="rec-author-info"><strong>Francesco L.</strong><span>Google · 2024</span></div>
-        </div>
-      </div>
-      <div class="rec-card reveal">
-        <div class="rec-stars">★★★★★</div>
-        <p class="rec-text">Eccezionale! Il gelato è favoloso, i pasticcini si sciolgono in bocca. Difficile trovare un equilibrio così buono tra qualità e prezzo a Roma.</p>
-        <div class="rec-author">
-          <div class="rec-avatar" style="background:#8b3a1a;">S</div>
-          <div class="rec-author-info"><strong>Silvia R.</strong><span>Restaurant Guru · 2024</span></div>
-        </div>
-      </div>
-      <div class="rec-card reveal">
-        <div class="rec-stars">★★★★★</div>
-        <p class="rec-text">Gelateria di quartiere che non delude mai. Ogni stagione nuovi gusti con frutta fresca. Il semifreddo per il compleanno di mio figlio era spettacolare!</p>
-        <div class="rec-author">
-          <div class="rec-avatar" style="background:#6b3fa0;">L</div>
-          <div class="rec-author-info"><strong>Laura P.</strong><span>Google · 2025</span></div>
-        </div>
-      </div>
-      <div class="rec-card reveal">
-        <div class="rec-stars">★★★★★</div>
-        <p class="rec-text">La brioche col tuppo abbinata alla granita di mandorla è la colazione più buona fuori dalla Sicilia. Ci torno ogni fine settimana con tutta la famiglia.</p>
-        <div class="rec-author">
-          <div class="rec-avatar" style="background:#c9921a;">C</div>
-          <div class="rec-author-info"><strong>Carlo T.</strong><span>Google · 2025</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="stripe-divider"></div>
+<div class="wave-divider">
+  <svg viewBox="0 0 1440 50" preserveAspectRatio="none">
+    <path d="M0,25 C120,45 240,5 360,25 C480,45 600,5 720,25 C840,45 960,5 1080,25 C1200,45 1320,5 1440,25 L1440,50 L0,50 Z" fill="var(--terra)"/>
+    <path d="M1440,25 C1560,45 1680,5 1800,25 C1920,45 2040,5 2160,25 C2280,45 2400,45 2520,25 C2640,45 2760,5 2880,25 L2880,50 L1440,50 Z" fill="var(--terra)"/>
+  </svg>
+</div>
 
 <!-- ORDINA -->
 <section id="ordina">
   <div class="section-inner">
     <div class="section-eyebrow" style="color:rgba(255,255,255,0.6);">Prenota la tua dolcezza</div>
-    <h2 class="section-title section-title-light reveal">Contattaci per <em>ordinare la tua torta</em></h2>
+    <h2 class="section-title section-title-light reveal from-bottom">Contattaci per <em>ordinare la tua torta</em></h2>
     <div class="ordina-inner">
-      <div class="ordina-text reveal">
+      <div class="ordina-text reveal from-left">
         <h3>Ogni torta è un'opera d'arte unica</h3>
         <p>Le nostre torte gelato vengono realizzate a mano con cura artigianale. Ogni strato, ogni decorazione, ogni dettaglio è pensato per rendere il tuo momento speciale davvero indimenticabile.</p>
         <p>Per le torte sono necessarie almeno <strong>48 ore di anticipo</strong>. Siamo disponibili a seguire qualsiasi richiesta personalizzata.</p>
         <div class="contatti-links">
           <a href="tel:+39065678901" class="contatto-link">
-            <span class="contatto-link-icon">📞</span>
-            <span>Chiamaci direttamente</span>
+            <div class="contatto-link-content">
+              <span class="contatto-link-icon">📞</span>
+              <span>Chiamaci</span>
+            </div>
           </a>
           <a href="https://www.facebook.com/ilgelatodibarbaraeroberto" class="contatto-link" target="_blank">
-            <span class="contatto-link-icon">📘</span>
-            <span>Pagina Facebook ufficiale</span>
+            <div class="contatto-link-content">
+              <span class="contatto-link-icon">📘</span>
+              <span>Facebook</span>
+            </div>
           </a>
-          <a href="https://www.google.com/maps/dir/?api=1&destination=Via+Giambattista+Bassani+22+Roma" target="_blank" class="contatto-link">
-            <span class="contatto-link-icon">🗺️</span>
-            <span>Indicazioni stradali</span>
+          <a href="https://www.google.com/maps/dir/?api=1&destination=Via+Giambattista+Bassani+22+Roma" target="_blank" class="contatto-link" style="grid-column: 1 / -1;">
+            <div class="contatto-link-content">
+              <span class="contatto-link-icon">🗺️</span>
+              <span>Indicazioni stradali</span>
+            </div>
           </a>
         </div>
       </div>
-      <div class="ordina-img-block reveal">
-        <img src="https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=800&auto=format&fit=crop&q=80"
-          alt="Torta gelato personalizzata con decorazioni">
+      <div class="ordina-img-block reveal from-right">
+        <div class="insta-slideshow" id="insta-slideshow">
+          <img src="images/insta/insta31.jpg" class="active" alt="Creazione artigianale 1">
+          <img src="images/insta/insta15.jpg" alt="Creazione artigianale 2">
+          <img src="images/insta/insta8.jpg" alt="Creazione artigianale 3">
+          <img src="images/insta/insta28.jpg" alt="Creazione artigianale 4">
+          <img src="images/insta/insta13.jpg" alt="Creazione artigianale 5">
+        </div>
         <div class="ordina-note">
-          ⏰ Ricorda: le torte personalizzate richiedono <strong>almeno 48 ore</strong> di anticipo. Per eventi speciali, contattaci prima possibile.
+          <div class="ordina-note-icon">⏰</div>
+          <div>Ricorda: le torte personalizzate richiedono <strong>almeno 48 ore</strong> di anticipo. Contattaci in anticipo!</div>
         </div>
       </div>
     </div>
   </div>
 </section>
+
+<!-- GUSTO MODAL -->
+<div id="gusto-modal">
+  <div class="modal-content">
+    <div class="modal-color-header" id="modal-color-header">
+      <div class="modal-emoji" id="modal-emoji"></div>
+    </div>
+    <div class="modal-name" id="modal-name"></div>
+    <div class="modal-tags" id="modal-tags"></div>
+    <div class="modal-desc" id="modal-desc"></div>
+    <button class="modal-close" onclick="closeGustoModal()">Chiudi</button>
+  </div>
+</div>
 
 <!-- FOOTER -->
 <footer>
@@ -1410,174 +1953,710 @@ footer a:hover { text-decoration: underline; }
     <a href="https://www.facebook.com/ilgelatodibarbaraeroberto" target="_blank">Facebook</a> ·
     <a href="https://maps.google.com/?q=Via+Giambattista+Bassani+22+Roma" target="_blank">Google Maps</a><br>
     <br>
-    <small style="opacity:0.35;">Sito a scopo dimostrativo · © 2025 Il Gelato di Barbara e Roberto</small>
+    <small style="opacity:0.35;">© 2025 Il Gelato di Barbara e Roberto</small>
   </p>
 </footer>
 
 <div id="toast">🍦 Gustoso!</div>
 
 <div id="gelato-float">
-  <button class="float-btn" onclick="window.location='#ordina'" title="Ordina ora">🎂</button>
-  <button class="float-btn" onclick="window.location='#gusti'" title="Gusti">🍦</button>
+  <button class="float-btn" onclick="smoothScrollTo('#ordina')" title="Ordina ora">🎂</button>
+  <button class="float-btn" onclick="smoothScrollTo('#gusti')" title="Gusti">🍦</button>
   <button class="float-btn" onclick="window.location='tel:+39065678901'" title="Chiama">📞</button>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-/* ── THREE.JS BG ── */
+/* ═══════════════════════════════════════════
+   IMMERSIVE 3D GELATO EXPERIENCE
+═══════════════════════════════════════════ */
+
+/* ── Reduced motion / mobile check ── */
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isMobile = window.innerWidth < 768;
+
+/* ── CUSTOM CURSOR ── */
+(function(){
+  if(isMobile || prefersReducedMotion) return;
+  const cursor = document.getElementById('custom-cursor');
+  const dot = document.getElementById('cursor-dot');
+  let cx = 0, cy = 0, dx = 0, dy = 0;
+  let trailCount = 0;
+
+  document.addEventListener('mousemove', e => {
+    dx = e.clientX; dy = e.clientY;
+    // Cursor trail particles
+    if(trailCount++ % 3 === 0) {
+      const trail = document.createElement('div');
+      trail.className = 'cursor-trail';
+      trail.style.left = e.clientX + 'px';
+      trail.style.top = e.clientY + 'px';
+      trail.style.width = (3 + Math.random()*5) + 'px';
+      trail.style.height = trail.style.width;
+      document.body.appendChild(trail);
+      setTimeout(() => trail.remove(), 600);
+    }
+  });
+
+  function updateCursor(){
+    cx += (dx - cx) * 0.12;
+    cy += (dy - cy) * 0.12;
+    cursor.style.left = cx + 'px';
+    cursor.style.top = cy + 'px';
+    dot.style.left = dx + 'px';
+    dot.style.top = dy + 'px';
+    requestAnimationFrame(updateCursor);
+  }
+  updateCursor();
+
+  // Expand cursor on hover
+  const hoverEls = 'a, button, .gusto-card, .prezzo-card, .torta-card, .info-card, .gf-card, .rec-card, .contatto-link, .tab-btn, .float-btn, .foto-card';
+  document.querySelectorAll(hoverEls).forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+  });
+  // Also for dynamically created elements
+  document.addEventListener('mouseover', e => {
+    if(e.target.closest(hoverEls)) cursor.classList.add('hover');
+  });
+  document.addEventListener('mouseout', e => {
+    if(e.target.closest(hoverEls)) cursor.classList.remove('hover');
+  });
+})();
+
+/* ── THREE.JS 3D GELATO WORLD ── */
 (function(){
   const canvas = document.getElementById('bg-canvas');
-  const renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:true});
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  if(!canvas) return;
+
+  const renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias: !isMobile});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1 : 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 100);
-  camera.position.z = 20;
+  // Volumetric fog — ivory/gold
+  scene.fog = new THREE.FogExp2(0xfaf6ef, 0.018);
 
-  const colors = [0x0d1f35,0xc8962a,0xd96b2a,0x3a6b3a,0x7a2c0e,0x162d4a,0xe8b84b];
+  const camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 120);
+  camera.position.z = 28;
 
-  /* Esagoni */
-  const tiles = [];
-  const hexGeo = new THREE.CylinderGeometry(0.55,0.55,0.07,6);
-  for(let i=0;i<70;i++){
-    const mat = new THREE.MeshPhongMaterial({
-      color: colors[Math.floor(Math.random()*colors.length)],
-      transparent:true,
-      opacity: 0.12 + Math.random()*0.18,
-      shininess:60
+  // Gelato colors
+  const gelatoColors = {
+    vaniglia: 0xf5e6a8,
+    fragola: 0xf4a0b0,
+    pistacchio: 0x8cc084,
+    cioccolato: 0x6b3a2a,
+    nocciola: 0xc89664,
+    limone: 0xf0e060,
+    mango: 0xf0a030
+  };
+  const colorKeys = Object.keys(gelatoColors);
+
+  /* -- Create ice cream cone geometry -- */
+  function createIceCreamCone(scale) {
+    const group = new THREE.Group();
+    const s = scale || 1;
+
+    // Cone (wafer)
+    const coneGeo = new THREE.ConeGeometry(0.6*s, 1.8*s, 8);
+    const coneMat = new THREE.MeshPhongMaterial({
+      color: 0xd4a050,
+      shininess: 30,
+      transparent: true,
+      opacity: 0.25
     });
-    const m = new THREE.Mesh(hexGeo,mat);
-    m.position.set((Math.random()-.5)*60,(Math.random()-.5)*60,(Math.random()-.5)*12-5);
-    m.rotation.set(Math.random()*Math.PI,Math.random()*Math.PI,Math.random()*Math.PI);
-    m.userData={vx:(Math.random()-.5)*.007,vy:(Math.random()-.5)*.006,vz:(Math.random()-.5)*.003,rx:(Math.random()-.5)*.007,ry:(Math.random()-.5)*.009};
-    scene.add(m); tiles.push(m);
+    const cone = new THREE.Mesh(coneGeo, coneMat);
+    cone.position.y = -0.9*s;
+    group.add(cone);
+
+    // Gelato scoops (stacked)
+    const numScoops = 2 + Math.floor(Math.random()*2);
+    for(let i = 0; i < numScoops; i++){
+      const radius = (0.55 - i*0.08) * s;
+      const scoopGeo = new THREE.SphereGeometry(radius, 12, 10);
+      const colorKey = colorKeys[Math.floor(Math.random()*colorKeys.length)];
+      const scoopMat = new THREE.MeshPhongMaterial({
+        color: gelatoColors[colorKey],
+        shininess: 90,
+        transparent: true,
+        opacity: 0.3,
+        specular: 0x444444
+      });
+      const scoop = new THREE.Mesh(scoopGeo, scoopMat);
+      scoop.position.y = i * 0.75 * s;
+      group.add(scoop);
+    }
+    return group;
   }
 
-  /* Sfere gelato */
-  const spheres=[];
-  const sColors=[0xf5c842,0xe87c2b,0x8b4513,0xff8fab,0x90ee90,0xdda0dd];
-  for(let i=0;i<25;i++){
-    const r=.15+Math.random()*.45;
-    const g=new THREE.SphereGeometry(r,10,10);
-    const mat=new THREE.MeshPhongMaterial({color:sColors[Math.floor(Math.random()*sColors.length)],transparent:true,opacity:.1+Math.random()*.15,shininess:100});
-    const m=new THREE.Mesh(g,mat);
-    m.position.set((Math.random()-.5)*55,(Math.random()-.5)*55,(Math.random()-.5)*10-3);
-    m.userData={vx:(Math.random()-.5)*.01,vy:(Math.random()-.5)*.008};
-    scene.add(m); spheres.push(m);
+  /* -- Spawn 3D gelato cones -- */
+  const cones = [];
+  const coneCount = isMobile ? 4 : 10;
+  for(let i = 0; i < coneCount; i++){
+    const scale = 0.6 + Math.random() * 1.2;
+    const iceCream = createIceCreamCone(scale);
+    const depth = -5 + Math.random() * -25;
+    iceCream.position.set(
+      (Math.random()-0.5) * 60,
+      (Math.random()-0.5) * 50,
+      depth
+    );
+    iceCream.rotation.set(
+      Math.random()*Math.PI,
+      Math.random()*Math.PI,
+      Math.random()*Math.PI*0.3
+    );
+    iceCream.userData = {
+      speed: 0.002 + Math.random()*0.004,
+      ampX: 0.3 + Math.random()*0.8,
+      ampY: 0.5 + Math.random()*1.0,
+      phaseX: Math.random()*Math.PI*2,
+      phaseY: Math.random()*Math.PI*2,
+      rotSpeed: (Math.random()-0.5)*0.008,
+      depth: Math.abs(depth),
+      origY: iceCream.position.y
+    };
+    scene.add(iceCream);
+    cones.push(iceCream);
   }
 
-  /* Particelle */
-  const pGeo=new THREE.BufferGeometry();
-  const pN=350, pPos=new Float32Array(pN*3);
-  for(let i=0;i<pN*3;i++) pPos[i]=(Math.random()-.5)*80;
-  pGeo.setAttribute('position',new THREE.BufferAttribute(pPos,3));
-  const particles=new THREE.Points(pGeo,new THREE.PointsMaterial({color:0xc8962a,size:.05,transparent:true,opacity:.3}));
+  /* -- Floating gelato spheres -- */
+  const spheres = [];
+  const sphereCount = isMobile ? 3 : 8;
+  for(let i = 0; i < sphereCount; i++){
+    const r = 0.2 + Math.random()*0.5;
+    const geo = new THREE.SphereGeometry(r, 14, 12);
+    const colorKey = colorKeys[Math.floor(Math.random()*colorKeys.length)];
+    const mat = new THREE.MeshPhongMaterial({
+      color: gelatoColors[colorKey],
+      shininess: 120,
+      transparent: true,
+      opacity: 0.15 + Math.random()*0.15,
+      specular: 0x666666
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(
+      (Math.random()-0.5)*55,
+      (Math.random()-0.5)*45,
+      -2 + Math.random()*-15
+    );
+    mesh.userData = {
+      speed: 0.003 + Math.random()*0.006,
+      amp: 0.3 + Math.random()*0.6,
+      phase: Math.random()*Math.PI*2,
+      depth: Math.abs(mesh.position.z)
+    };
+    scene.add(mesh);
+    spheres.push(mesh);
+  }
+
+  /* -- Floating 3D donuts (pastries) -- */
+  const donuts = [];
+  const donutCount = isMobile ? 2 : 6;
+  const donutColors = [0xe06080, 0x6b3a2a, 0xf0a030, 0xf5e6a8];
+  for(let i = 0; i < donutCount; i++){
+    const scale = 0.6 + Math.random() * 0.8;
+    const geo = new THREE.TorusGeometry(0.35 * scale, 0.12 * scale, 8, 24);
+    const mat = new THREE.MeshPhongMaterial({
+      color: donutColors[Math.floor(Math.random() * donutColors.length)],
+      shininess: 120,
+      transparent: true,
+      opacity: 0.2 + Math.random() * 0.2,
+      specular: 0xffffff
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(
+      (Math.random()-0.5)*60,
+      (Math.random()-0.5)*50,
+      -5 + Math.random()*-20
+    );
+    mesh.rotation.set(
+      Math.random()*Math.PI,
+      Math.random()*Math.PI,
+      0
+    );
+    mesh.userData = {
+      speed: 0.003 + Math.random()*0.005,
+      ampX: 0.2 + Math.random()*0.6,
+      ampY: 0.4 + Math.random()*0.8,
+      phaseX: Math.random()*Math.PI*2,
+      phaseY: Math.random()*Math.PI*2,
+      rotSpeedX: (Math.random()-0.5)*0.01,
+      rotSpeedY: (Math.random()-0.5)*0.01,
+      depth: Math.abs(mesh.position.z),
+      origY: mesh.position.y
+    };
+    scene.add(mesh);
+    donuts.push(mesh);
+  }
+
+  /* -- Gold particles -- */
+  const pGeo = new THREE.BufferGeometry();
+  const pN = isMobile ? 50 : 150;
+  const pPos = new Float32Array(pN*3);
+  for(let i = 0; i < pN*3; i++) pPos[i] = (Math.random()-0.5)*80;
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pPos,3));
+  const particles = new THREE.Points(pGeo, new THREE.PointsMaterial({
+    color: 0xe8b84b,
+    size: 0.06,
+    transparent: true,
+    opacity: 0.35
+  }));
   scene.add(particles);
 
-  const amb=new THREE.AmbientLight(0xffffff,.45); scene.add(amb);
-  const d1=new THREE.DirectionalLight(0xc8962a,.7); d1.position.set(5,5,5); scene.add(d1);
-  const d2=new THREE.DirectionalLight(0x1a4a8a,.4); d2.position.set(-5,-3,3); scene.add(d2);
+  /* -- Lights -- */
+  const ambient = new THREE.AmbientLight(0xfff5e6, 0.5);
+  scene.add(ambient);
 
-  let mX=0,mY=0,scrollY=0,t=0;
-  document.addEventListener('mousemove',e=>{mX=(e.clientX/window.innerWidth-.5)*2;mY=(e.clientY/window.innerHeight-.5)*2;});
-  window.addEventListener('scroll',()=>{scrollY=window.scrollY;});
-  window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});
+  const dirLight1 = new THREE.DirectionalLight(0xc8962a, 0.6);
+  dirLight1.position.set(5, 8, 5);
+  scene.add(dirLight1);
+
+  const dirLight2 = new THREE.DirectionalLight(0x3a6baa, 0.3);
+  dirLight2.position.set(-5, -3, 3);
+  scene.add(dirLight2);
+
+  // Dynamic mouse light
+  const mouseLight = new THREE.PointLight(0xe8b84b, 0.8, 40);
+  mouseLight.position.set(0, 0, 10);
+  scene.add(mouseLight);
+
+  let mX = 0, mY = 0, scrollY = 0, time = 0;
+
+  document.addEventListener('mousemove', e => {
+    mX = (e.clientX / window.innerWidth - 0.5) * 2;
+    mY = (e.clientY / window.innerHeight - 0.5) * 2;
+  });
+
+  window.addEventListener('scroll', () => { scrollY = window.scrollY; }, {passive:true});
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
 
   function animate(){
-    requestAnimationFrame(animate); t+=.007;
-    camera.position.x+=(mX*1.2-camera.position.x)*.025;
-    camera.position.y+=(-mY*1.2-camera.position.y)*.025;
-    camera.position.z=20-scrollY*.003;
-    tiles.forEach(tile=>{
-      tile.position.x+=tile.userData.vx; tile.position.y+=tile.userData.vy; tile.position.z+=tile.userData.vz;
-      tile.rotation.x+=tile.userData.rx; tile.rotation.y+=tile.userData.ry;
-      if(Math.abs(tile.position.x)>31) tile.userData.vx*=-1;
-      if(Math.abs(tile.position.y)>31) tile.userData.vy*=-1;
-      if(tile.position.z>3||tile.position.z<-12) tile.userData.vz*=-1;
+    requestAnimationFrame(animate);
+    time += 0.005;
+
+    // Camera breathing movement
+    camera.position.x += (mX * 1.5 - camera.position.x) * 0.02;
+    camera.position.y += (-mY * 1.2 + Math.sin(time*0.5)*0.3 - camera.position.y) * 0.02;
+    camera.position.z = 28 - scrollY * 0.004;
+
+    // Mouse light follows cursor
+    mouseLight.position.x += (mX * 20 - mouseLight.position.x) * 0.05;
+    mouseLight.position.y += (-mY * 15 - mouseLight.position.y) * 0.05;
+
+    // Animate cones — sinusoidal + parallax
+    cones.forEach(cone => {
+      const d = cone.userData;
+      cone.position.x += Math.sin(time * d.speed * 100 + d.phaseX) * d.ampX * 0.01;
+      cone.position.y = d.origY + Math.sin(time * d.speed * 80 + d.phaseY) * d.ampY;
+      cone.rotation.x += d.rotSpeed;
+      cone.rotation.y += d.rotSpeed * 0.7;
+
+      // Parallax on scroll
+      const parallaxFactor = 1 / (1 + d.depth * 0.05);
+      cone.position.y += scrollY * 0.002 * parallaxFactor;
     });
-    spheres.forEach((s,i)=>{
-      s.position.x+=s.userData.vx; s.position.y+=s.userData.vy+Math.sin(t+i*.5)*.003;
-      if(Math.abs(s.position.x)>28) s.userData.vx*=-1;
-      if(Math.abs(s.position.y)>28) s.userData.vy*=-1;
+
+    // Animate spheres
+    spheres.forEach((s, i) => {
+      const d = s.userData;
+      s.position.y += Math.sin(time * d.speed * 100 + d.phase) * d.amp * 0.005;
+      s.position.x += Math.cos(time * d.speed * 60 + d.phase) * 0.003;
+
+      const parallaxFactor = 1 / (1 + d.depth * 0.06);
+      s.position.y += scrollY * 0.001 * parallaxFactor;
     });
-    particles.rotation.y=t*.04;
-    renderer.render(scene,camera);
+
+    // Animate donuts
+    donuts.forEach(d => {
+      const ud = d.userData;
+      d.position.x += Math.sin(time * ud.speed * 90 + ud.phaseX) * ud.ampX * 0.01;
+      d.position.y = ud.origY + Math.sin(time * ud.speed * 70 + ud.phaseY) * ud.ampY;
+      d.rotation.x += ud.rotSpeedX;
+      d.rotation.y += ud.rotSpeedY;
+      
+      const parallaxFactor = 1 / (1 + ud.depth * 0.05);
+      d.position.y += scrollY * 0.0018 * parallaxFactor;
+    });
+
+    particles.rotation.y = time * 0.06;
+    particles.rotation.x = time * 0.02;
+
+    renderer.render(scene, camera);
   }
-  animate();
+
+  if(!prefersReducedMotion) animate();
 })();
 
-/* ── GUSTI ── */
+/* ── HERO TITLE LETTER REVEAL ── */
+(function(){
+  const title = document.getElementById('hero-title');
+  if(!title) return;
+  const html = title.innerHTML;
+  // Process text nodes for letter animation
+  let delay = 0;
+  const processNode = (node) => {
+    if(node.nodeType === 3) {
+      // Text node
+      const text = node.textContent;
+      const span = document.createElement('span');
+      for(let i = 0; i < text.length; i++){
+        const letter = document.createElement('span');
+        letter.className = 'letter';
+        letter.textContent = text[i] === ' ' ? '\u00a0' : text[i];
+        letter.style.animationDelay = (0.5 + delay * 0.04) + 's';
+        delay++;
+        span.appendChild(letter);
+      }
+      node.parentNode.replaceChild(span, node);
+    } else if(node.nodeType === 1) {
+      // Element — process children
+      const children = Array.from(node.childNodes);
+      children.forEach(processNode);
+    }
+  };
+  const children = Array.from(title.childNodes);
+  children.forEach(processNode);
+})();
+
+/* ── SMOOTH SCROLL with Custom Easing ── */
+function smoothScrollTo(target) {
+  const el = document.querySelector(target);
+  if(!el) return;
+  const targetY = el.getBoundingClientRect().top + window.scrollY - 72;
+  const startY = window.scrollY;
+  const diff = targetY - startY;
+  const duration = 900;
+  let start = null;
+
+  function easeInOutCubic(t) {
+    return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2;
+  }
+
+  function step(timestamp) {
+    if(!start) start = timestamp;
+    const progress = Math.min((timestamp - start) / duration, 1);
+    window.scrollTo(0, startY + diff * easeInOutCubic(progress));
+    if(progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// Intercept all anchor clicks
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = a.getAttribute('href');
+    smoothScrollTo(target);
+    // Close mobile menu
+    document.getElementById('nav-links').classList.remove('open');
+    document.getElementById('hamburger').classList.remove('open');
+  });
+});
+
+/* ── COUNT-UP ANIMATION ── */
+function animateCountUp(el) {
+  const target = parseInt(el.dataset.target) || 0;
+  const duration = 1500;
+  let start = null;
+  function step(ts) {
+    if(!start) start = ts;
+    const progress = Math.min((ts - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.floor(target * eased);
+    if(progress < 1) requestAnimationFrame(step);
+    else el.textContent = target;
+  }
+  requestAnimationFrame(step);
+}
+
+// Count-up for hero gusti counter
+const gustiCountEl = document.getElementById('gusti-count');
+let gustiCounted = false;
+const gustiCountObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting && !gustiCounted) {
+      gustiCounted = true;
+      animateCountUp(gustiCountEl);
+    }
+  });
+}, {threshold: 0.5});
+if(gustiCountEl) gustiCountObs.observe(gustiCountEl);
+
+// Count-up for prices
+let pricesCounted = false;
+const prezziSection = document.getElementById('prezzi');
+const priceCountObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting && !pricesCounted) {
+      pricesCounted = true;
+      document.querySelectorAll('.prezzo-val[data-price]').forEach(el => {
+        const price = parseFloat(el.dataset.price);
+        const duration = 1200;
+        let start = null;
+        const hasSmall = el.querySelector('small');
+        function step(ts) {
+          if(!start) start = ts;
+          const progress = Math.min((ts - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const current = price * eased;
+          if(hasSmall) {
+            const whole = Math.floor(current);
+            const dec = Math.round((current - whole) * 100).toString().padStart(2,'0');
+            el.innerHTML = `€ ${whole}<small>.${dec}</small>`;
+          } else {
+            el.textContent = `€ ${Math.floor(current)}`;
+          }
+          if(progress < 1) requestAnimationFrame(step);
+          else {
+            // Restore original
+            if(hasSmall) {
+              const whole = Math.floor(price);
+              const dec = Math.round((price - whole) * 100).toString().padStart(2,'0');
+              el.innerHTML = dec === '00' ? `€ ${whole}` : `€ ${whole}<small>.${dec}</small>`;
+            } else {
+              el.textContent = `€ ${price}`;
+            }
+          }
+        }
+        requestAnimationFrame(step);
+      });
+    }
+  });
+}, {threshold: 0.2});
+if(prezziSection) priceCountObs.observe(prezziSection);
+
+/* ── GUSTI DATA ── */
 const gusti = [
-  {name:'Torta Sacher',emoji:'🎂',cat:['cremosi'],color:'#6b3a1a',extra:''},
-  {name:'Torta della Nonna',emoji:'🥧',cat:['cremosi'],color:'#d4a017',extra:''},
-  {name:'Caffè',emoji:'☕',cat:['cremosi'],color:'#4b2e1f',extra:''},
-  {name:'Mandorla',emoji:'🌰',cat:['cremosi','siciliani'],color:'#c9921a',extra:'gf'},
-  {name:'Zabaione',emoji:'🥚',cat:['cremosi'],color:'#e0b84f',extra:''},
-  {name:'Liquirizia',emoji:'⚫',cat:['cremosi'],color:'#222',extra:'gf'},
-  {name:'Fior di Latte',emoji:'🥛',cat:['cremosi'],color:'#ccc',extra:'gf'},
-  {name:'Tiramisù',emoji:'☕',cat:['cremosi'],color:'#6b3a1a',extra:''},
-  {name:'Bounty',emoji:'🥥',cat:['cremosi'],color:'#c9921a',extra:''},
-  {name:'Cocco',emoji:'🥥',cat:['cremosi'],color:'#f0e6d2',extra:''},
-  {name:'Kinder Maxi',emoji:'🍫',cat:['cremosi'],color:'#8b5e3c',extra:''},
-  {name:'Stracciatella',emoji:'🖤',cat:['cremosi'],color:'#555',extra:''},
-  {name:'Kinder Bueno',emoji:'🍫',cat:['cremosi'],color:'#a56a43',extra:''},
-  {name:'Pistacchio',emoji:'💚',cat:['cremosi','siciliani'],color:'#2d7a3a',extra:''},
-  {name:'Cioccolato Fondente',emoji:'🍫',cat:['cremosi'],color:'#3b1f0f',extra:'gf'},
-  {name:'Cioccolato al Latte',emoji:'🍫',cat:['cremosi'],color:'#8b5e3c',extra:''},
-  {name:'Crema',emoji:'🍮',cat:['cremosi'],color:'#f0d080',extra:''},
-  {name:'Nocciola',emoji:'🌰',cat:['cremosi'],color:'#8b5e3c',extra:''},
-  {name:'Cremino',emoji:'🍫',cat:['cremosi'],color:'#6b4c3b',extra:''},
-  {name:'Cannolo',emoji:'🧁',cat:['siciliani'],color:'#c9921a',extra:''},
-  {name:'Barbara & Roberto',emoji:'🍮',cat:['speciali'],color:'#c9921a',extra:''},
-  {name:'Cheesecake',emoji:'🍰',cat:['speciali'],color:'#f4d6a0',extra:''},
-  {name:'Caramello Salato',emoji:'🧂',cat:['speciali'],color:'#d4a017',extra:''},
-  {name:'Croccante Amarena',emoji:'🍒',cat:['speciali'],color:'#9b1c31',extra:''},
-  {name:'Setteveli Cioccolato',emoji:'🍫',cat:['speciali'],color:'#3b1f0f',extra:''},
-  {name:'Setteveli Pistacchio',emoji:'💚',cat:['speciali'],color:'#2d7a3a',extra:''},
-  {name:'Millefoglie',emoji:'🥮',cat:['speciali'],color:'#e0c070',extra:''},
-  {name:'Baciamo le Mani',emoji:'🤌',cat:['speciali','siciliani'],color:'#8b5e3c',extra:''},
-  {name:'Yogurt',emoji:'🥣',cat:['speciali'],color:'#ddd',extra:''},
-  {name:'Sorbetto Caffè',emoji:'☕',cat:['sorbetti'],color:'#4b2e1f',extra:'veg gf'},
-  {name:'Sorbetto Fragola',emoji:'🍓',cat:['sorbetti'],color:'#e84040',extra:'veg gf'},
-  {name:'Sorbetto Limone',emoji:'🍋',cat:['sorbetti'],color:'#d4c017',extra:'veg gf'},
-  {name:'Sorbetto Pistacchio',emoji:'💚',cat:['sorbetti'],color:'#2d7a3a',extra:'veg gf'},
-  {name:'Sorbetto Amarena',emoji:'🍒',cat:['sorbetti'],color:'#9b1c31',extra:'veg gf'},
-  {name:'Sorbetto Gelso',emoji:'🫐',cat:['sorbetti'],color:'#4b2354',extra:'veg gf'},
-  {name:'Sorbetto Mandorla',emoji:'🌰',cat:['sorbetti'],color:'#c9921a',extra:'veg gf'},
-  {name:'Fragola',emoji:'🍓',cat:['frutta'],color:'#e84040',extra:'veg gf'},
-  {name:'Limone',emoji:'🍋',cat:['frutta','siciliani'],color:'#d4c017',extra:'veg gf'},
-  {name:'Banana',emoji:'🍌',cat:['frutta'],color:'#f0d020',extra:'veg gf'},
-  {name:'Melone',emoji:'🍈',cat:['frutta'],color:'#6a9a2a',extra:'veg gf'},
-  {name:'Frutti di Bosco',emoji:'🫐',cat:['frutta'],color:'#6b3fa0',extra:'veg gf'},
-  {name:'Lampone',emoji:'❤️',cat:['frutta'],color:'#cc1155',extra:'veg gf'},
-  {name:'Gelso',emoji:'🫐',cat:['frutta'],color:'#4b2354',extra:'veg gf'},
-  {name:'Mango',emoji:'🥭',cat:['frutta'],color:'#e87c2b',extra:'veg gf'}
+  /* ── CREMOSI ── */
+  {name:'Torta Sacher',emoji:'🎂',cat:['cremosi'],color:'#6b3a1a',extra:'',
+    desc:'Intenso cioccolato fondente con marmellata di albicocche, ispirato alla celebre torta viennese.',
+    img:'https://images.unsplash.com/photo-1606890658317-7d14490b76fd?w=420&auto=format&fit=crop&q=75'},
+  {name:'Torta della Nonna',emoji:'🥧',cat:['cremosi'],color:'#d4a017',extra:'',
+    desc:'Crema pasticcera con pinoli croccanti, il sapore della tradizione italiana.',
+    img:'https://images.unsplash.com/photo-1519915028121-7d3463d20b2e?w=420&auto=format&fit=crop&q=75'},
+  {name:'Caffè',emoji:'☕',cat:['cremosi'],color:'#4b2e1f',extra:'',
+    desc:'Espresso napoletano puro, per chi ama il gusto deciso del caffè.',
+    img:'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=420&auto=format&fit=crop&q=75'},
+  {name:'Mandorla',emoji:'🌰',cat:['cremosi','siciliani'],color:'#c9921a',extra:'gf',
+    desc:'Mandorla d\'Avola tostata, il sapore della Sicilia più autentica.',
+    img:'https://images.unsplash.com/photo-1616954598886-8ead44c61b49?w=420&auto=format&fit=crop&q=75'},
+  {name:'Zabaione',emoji:'🥚',cat:['cremosi'],color:'#e0b84f',extra:'',
+    desc:'Classico zabaione con marsala, cremoso e avvolgente.',
+    img:'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=420&auto=format&fit=crop&q=75'},
+  {name:'Liquirizia',emoji:'⚫',cat:['cremosi'],color:'#222',extra:'gf',
+    desc:'Liquirizia di Calabria DOP, intenso e irresistibile.',
+    img:'https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=420&auto=format&fit=crop&q=75'},
+  {name:'Fior di Latte',emoji:'🥛',cat:['cremosi'],color:'#ccc',extra:'gf',
+    desc:'La purezza del latte fresco, semplice e perfetto.',
+    img:'https://images.unsplash.com/photo-1631123691417-5354cf8cafd5?w=420&auto=format&fit=crop&q=75'},
+  {name:'Tiramisù',emoji:'☕',cat:['cremosi'],color:'#6b3a1a',extra:'',
+    desc:'Mascarpone, caffè e cacao: il dolce italiano più amato al mondo.',
+    img:'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=420&auto=format&fit=crop&q=75'},
+  {name:'Bounty',emoji:'🥥',cat:['cremosi'],color:'#c9921a',extra:'',
+    desc:'Cocco grattugiato e cioccolato al latte, tropicale e goloso.',
+    img:'https://images.unsplash.com/photo-1560472355-536de3962603?w=420&auto=format&fit=crop&q=75'},
+  {name:'Cocco',emoji:'🥥',cat:['cremosi'],color:'#f0e6d2',extra:'',
+    desc:'Polpa di cocco fresco, esotico e rinfrescante.',
+    img:'https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=420&auto=format&fit=crop&q=75'},
+  {name:'Kinder Maxi',emoji:'🍫',cat:['cremosi'],color:'#8b5e3c',extra:'',
+    desc:'Ispirato al famoso snack, con cioccolato al latte e crema.',
+    img:'https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=420&auto=format&fit=crop&q=75'},
+  {name:'Stracciatella',emoji:'🖤',cat:['cremosi'],color:'#555',extra:'',
+    desc:'Fior di latte con scaglie di cioccolato fondente croccante.',
+    img:'https://images.unsplash.com/photo-1497636577773-f1231844b336?w=420&auto=format&fit=crop&q=75'},
+  {name:'Kinder Bueno',emoji:'🍫',cat:['cremosi'],color:'#a56a43',extra:'',
+    desc:'Nocciola e cioccolato al latte, il gusto più amato dai giovani.',
+    img:'https://images.unsplash.com/photo-1481391319762-47dff72954d9?w=420&auto=format&fit=crop&q=75'},
+  {name:'Pistacchio',emoji:'💚',cat:['cremosi','siciliani'],color:'#2d7a3a',extra:'',
+    desc:'Pistacchio di Bronte 100%, tostato e macinato a pietra.',
+    img:'https://images.unsplash.com/photo-1580915411954-282cb1b0d780?w=420&auto=format&fit=crop&q=75'},
+  {name:'Cioccolato Fondente',emoji:'🍫',cat:['cremosi'],color:'#3b1f0f',extra:'gf',
+    desc:'Cacao 72% monorigine, intenso e vellutato.',
+    img:'https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=420&auto=format&fit=crop&q=75'},
+  {name:'Cioccolato al Latte',emoji:'🍫',cat:['cremosi'],color:'#8b5e3c',extra:'',
+    desc:'Cioccolato dolce e cremoso, perfetto per i più piccoli.',
+    img:'https://images.unsplash.com/photo-1587314168485-3236d6710814?w=420&auto=format&fit=crop&q=75'},
+  {name:'Crema',emoji:'🍮',cat:['cremosi'],color:'#f0d080',extra:'',
+    desc:'Crema all\'uovo della tradizione, delicata e avvolgente.',
+    img:'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=420&auto=format&fit=crop&q=75'},
+  {name:'Nocciola',emoji:'🌰',cat:['cremosi'],color:'#8b5e3c',extra:'',
+    desc:'Nocciola delle Langhe tostata, un classico intramontabile.',
+    img:'https://images.unsplash.com/photo-1559748033-ab2a7c8e1c87?w=420&auto=format&fit=crop&q=75'},
+  {name:'Cremino',emoji:'🍫',cat:['cremosi'],color:'#6b4c3b',extra:'',
+    desc:'Cioccolato e nocciola stratificati, omaggio al gianduja piemontese.',
+    img:'https://images.unsplash.com/photo-1620138546344-7b2c38516edf?w=420&auto=format&fit=crop&q=75'},
+  /* ── SICILIANI ── */
+  {name:'Cannolo',emoji:'🧁',cat:['siciliani'],color:'#c9921a',extra:'',
+    desc:'Ricotta, scorza candita e pistacchio: il cannolo in forma di gelato.',
+    img:'https://images.unsplash.com/photo-1605807646983-377bc5a76493?w=420&auto=format&fit=crop&q=75'},
+  /* ── SPECIALI ── */
+  {name:'Barbara & Roberto',emoji:'🍮',cat:['speciali'],color:'#c9921a',extra:'',
+    desc:'La nostra ricetta segreta — il gusto che ci rappresenta. Da provare!',
+    img:'https://images.unsplash.com/photo-1536656099755-60cb2af04de9?w=420&auto=format&fit=crop&q=75'},
+  {name:'Cheesecake',emoji:'🍰',cat:['speciali'],color:'#f4d6a0',extra:'',
+    desc:'Crema al formaggio con base biscottata e coulis di frutti rossi.',
+    img:'https://images.unsplash.com/photo-1508737027454-e6454ef45afd?w=420&auto=format&fit=crop&q=75'},
+  {name:'Caramello Salato',emoji:'🧂',cat:['speciali'],color:'#d4a017',extra:'',
+    desc:'Dolce e salato in perfetto equilibrio, con sale di Cervia.',
+    img:'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=420&auto=format&fit=crop&q=75'},
+  {name:'Croccante Amarena',emoji:'🍒',cat:['speciali'],color:'#9b1c31',extra:'',
+    desc:'Amarena Fabbri con croccante di mandorle caramellate.',
+    img:'https://images.unsplash.com/photo-1560180474-e8563fd75bab?w=420&auto=format&fit=crop&q=75'},
+  {name:'Setteveli Cioccolato',emoji:'🍫',cat:['speciali'],color:'#3b1f0f',extra:'',
+    desc:'Sette strati di piacere al cioccolato, omaggio alla grande pasticceria.',
+    img:'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=420&auto=format&fit=crop&q=75'},
+  {name:'Setteveli Pistacchio',emoji:'💚',cat:['speciali'],color:'#2d7a3a',extra:'',
+    desc:'La variante pistacchio del nostro setteveli, unica e sorprendente.',
+    img:'https://images.unsplash.com/photo-1592417817098-8fd3d9eb14a5?w=420&auto=format&fit=crop&q=75'},
+  {name:'Millefoglie',emoji:'🥮',cat:['speciali'],color:'#e0c070',extra:'',
+    desc:'Crema chantilly con sfoglia caramellata croccante.',
+    img:'https://images.unsplash.com/photo-1519181245277-cffeb31da948?w=420&auto=format&fit=crop&q=75'},
+  {name:'Baciamo le Mani',emoji:'🤌',cat:['speciali','siciliani'],color:'#8b5e3c',extra:'',
+    desc:'Un omaggio alla Sicilia: mandorla, miele e cannella.',
+    img:'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=420&auto=format&fit=crop&q=75'},
+  {name:'Yogurt',emoji:'🥣',cat:['speciali'],color:'#ddd',extra:'',
+    desc:'Yogurt greco cremoso, leggermente acidulo e rinfrescante.',
+    img:'https://images.unsplash.com/photo-1488477304112-4944851de03d?w=420&auto=format&fit=crop&q=75'},
+  /* ── SORBETTI ── */
+  {name:'Sorbetto Caffè',emoji:'☕',cat:['sorbetti'],color:'#4b2e1f',extra:'veg gf',
+    desc:'Espresso ghiacciato in versione sorbetto, senza latte.',
+    img:'https://images.unsplash.com/photo-1521302080334-4bebac2763a6?w=420&auto=format&fit=crop&q=75'},
+  {name:'Sorbetto Fragola',emoji:'🍓',cat:['sorbetti'],color:'#e84040',extra:'veg gf',
+    desc:'Fragole mature di stagione, pura frutta ghiacciata.',
+    img:'https://images.unsplash.com/photo-1464305795204-6f5bbfc7fb81?w=420&auto=format&fit=crop&q=75'},
+  {name:'Sorbetto Limone',emoji:'🍋',cat:['sorbetti'],color:'#d4c017',extra:'veg gf',
+    desc:'Limoni di Sicilia, il sorbetto più rinfrescante che esista.',
+    img:'https://images.unsplash.com/photo-1523263685509-57c1d050d19b?w=420&auto=format&fit=crop&q=75'},
+  {name:'Sorbetto Pistacchio',emoji:'💚',cat:['sorbetti'],color:'#2d7a3a',extra:'veg gf',
+    desc:'Raro e prezioso: sorbetto di pistacchio, vegano e senza glutine.',
+    img:'https://images.unsplash.com/photo-1574570173583-e9c5e282de6c?w=420&auto=format&fit=crop&q=75'},
+  {name:'Sorbetto Amarena',emoji:'🍒',cat:['sorbetti'],color:'#9b1c31',extra:'veg gf',
+    desc:'Amarene selezionate, dolci e leggermente acidule.',
+    img:'https://images.unsplash.com/photo-1528975604071-b4dc52a2d18c?w=420&auto=format&fit=crop&q=75'},
+  {name:'Sorbetto Gelso',emoji:'🫐',cat:['sorbetti'],color:'#4b2354',extra:'veg gf',
+    desc:'Gelso nero di Sicilia, un frutto raro dal sapore intenso.',
+    img:'https://images.unsplash.com/photo-1606914501449-5a96b6ce24ca?w=420&auto=format&fit=crop&q=75'},
+  {name:'Sorbetto Mandorla',emoji:'🌰',cat:['sorbetti'],color:'#c9921a',extra:'veg gf',
+    desc:'Mandorla siciliana in versione sorbetto, fresco e delicato.',
+    img:'https://images.unsplash.com/photo-1566454544259-f4b94c3d758c?w=420&auto=format&fit=crop&q=75'},
+  /* ── FRUTTA ── */
+  {name:'Fragola',emoji:'🍓',cat:['frutta'],color:'#e84040',extra:'veg gf',
+    desc:'Fragole di campo, raccolte al punto perfetto di maturazione.',
+    img:'https://images.unsplash.com/photo-1587132137056-bfbf0166836e?w=420&auto=format&fit=crop&q=75'},
+  {name:'Limone',emoji:'🍋',cat:['frutta','siciliani'],color:'#d4c017',extra:'veg gf',
+    desc:'Limoni della costa amalfitana, agrumato e vibrante.',
+    img:'https://images.unsplash.com/photo-1587486936739-78adfd2c9b9d?w=420&auto=format&fit=crop&q=75'},
+  {name:'Banana',emoji:'🍌',cat:['frutta'],color:'#f0d020',extra:'veg gf',
+    desc:'Banana matura naturalmente, cremoso anche senza latte.',
+    img:'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=420&auto=format&fit=crop&q=75'},
+  {name:'Melone',emoji:'🍈',cat:['frutta'],color:'#6a9a2a',extra:'veg gf',
+    desc:'Melone cantalupo estivo, il sapore dell\'estate italiana.',
+    img:'https://images.unsplash.com/photo-1571575173927-1a85bd2c7c0e?w=420&auto=format&fit=crop&q=75'},
+  {name:'Frutti di Bosco',emoji:'🫐',cat:['frutta'],color:'#6b3fa0',extra:'veg gf',
+    desc:'Mix di more, mirtilli, lamponi e ribes, intenso e antiossidante.',
+    img:'https://images.unsplash.com/photo-1502741338009-cac2772e18bc?w=420&auto=format&fit=crop&q=75'},
+  {name:'Lampone',emoji:'❤️',cat:['frutta'],color:'#cc1155',extra:'veg gf',
+    desc:'Lamponi selvatici, il sorbetto più elegante e profumato.',
+    img:'https://images.unsplash.com/photo-1587351021355-a479a299d2f9?w=420&auto=format&fit=crop&q=75'},
+  {name:'Gelso',emoji:'🫐',cat:['frutta'],color:'#4b2354',extra:'veg gf',
+    desc:'Gelso nero siciliano, dolce e leggermente tannico.',
+    img:'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=420&auto=format&fit=crop&q=75'},
+  {name:'Mango',emoji:'🥭',cat:['frutta'],color:'#e87c2b',extra:'veg gf',
+    desc:'Mango tropicale maturo, esotico e vellutato.',
+    img:'https://images.unsplash.com/photo-1553279768-865429fa0078?w=420&auto=format&fit=crop&q=75'}
 ];
 
-function renderGusti(filter){
+let currentFilter = 'tutti';
+
+function renderGusti(filter, searchTerm){
   const grid = document.getElementById('gusti-grid');
-  const list = filter==='tutti' ? gusti :
+  let list = filter==='tutti' ? gusti :
     filter==='gf' ? gusti.filter(g=>g.extra.includes('gf')) :
     filter==='vegani' ? gusti.filter(g=>g.extra.includes('veg')) :
     gusti.filter(g=>g.cat.includes(filter));
-  grid.innerHTML = list.map(g=>{
+
+  if(searchTerm) {
+    const term = searchTerm.toLowerCase();
+    list = list.filter(g => g.name.toLowerCase().includes(term));
+  }
+
+  grid.innerHTML = list.map((g, idx) => {
     let tag = '';
     if(g.extra.includes('gf'))  tag += '<span class="gusto-tag gf">🌾 GF</span> ';
     if(g.extra.includes('veg')) tag += '<span class="gusto-tag veg">🌿 Vegano</span> ';
     if(g.cat.includes('speciali')) tag += '<span class="gusto-tag speciale">✦ Speciale</span>';
     if(!tag) tag = '<span class="gusto-tag">Artigianale</span>';
-    return `<div class="gusto-card" style="--card-color:${g.color}" onclick="showToast('🍦 ${g.name} — da provare!')">
-      <span class="gusto-emoji">${g.emoji}</span>
-      <div class="gusto-name">${g.name}</div>${tag}</div>`;
+    return `<div class="gusto-card" style="--card-color:${g.color}" onclick="openGustoModal(${gusti.indexOf(g)})" data-idx="${gusti.indexOf(g)}">
+      <div class="gusto-card-accent"></div>
+      <div class="gusto-card-body">
+        <span class="gusto-emoji">${g.emoji}</span>
+        <div class="gusto-name">${g.name}</div>${tag}
+      </div></div>`;
   }).join('');
+
+  // Add tilt effect to cards
+  if(!isMobile && !prefersReducedMotion) {
+    grid.querySelectorAll('.gusto-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        card.style.transform = `perspective(600px) rotateX(${-y*15}deg) rotateY(${x*15}deg) scale(1.05)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = '';
+      });
+    });
+  }
 }
-function filterGusti(cat,btn){
+
+function filterGusti(cat, btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  renderGusti(cat);
+  currentFilter = cat;
+  renderGusti(cat, document.getElementById('gusti-search').value);
 }
 renderGusti('tutti');
+
+// Search
+document.getElementById('gusti-search').addEventListener('input', function(){
+  renderGusti(currentFilter, this.value);
+});
+
+/* ── GUSTO MODAL ── */
+function openGustoModal(idx) {
+  const g = gusti[idx];
+  // Tint the modal header with the gusto's colour
+  const hdr = document.getElementById('modal-color-header');
+  if(hdr) hdr.style.background =
+    `linear-gradient(135deg, ${g.color}66 0%, ${g.color}22 100%)`;
+  document.getElementById('modal-emoji').textContent = g.emoji;
+  document.getElementById('modal-name').textContent = g.name;
+  let tags = '';
+  if(g.extra.includes('gf'))  tags += '<span class="gusto-tag gf" style="margin:0 4px;">🌾 Gluten Free</span>';
+  if(g.extra.includes('veg')) tags += '<span class="gusto-tag veg" style="margin:0 4px;">🌿 Vegano</span>';
+  if(g.cat.includes('speciali')) tags += '<span class="gusto-tag speciale" style="margin:0 4px;">✦ Specialità</span>';
+  if(g.cat.includes('siciliani')) tags += '<span class="gusto-tag" style="margin:0 4px;color:var(--arancio);">🍋 Siciliano</span>';
+  document.getElementById('modal-tags').innerHTML = tags;
+  document.getElementById('modal-desc').textContent = g.desc;
+  const modal = document.getElementById('gusto-modal');
+  modal.style.display = 'flex';
+  requestAnimationFrame(() => modal.classList.add('active'));
+}
+function closeGustoModal() {
+  const modal = document.getElementById('gusto-modal');
+  modal.classList.remove('active');
+  setTimeout(() => modal.style.display = 'none', 400);
+}
+document.getElementById('gusto-modal').addEventListener('click', e => {
+  if(e.target === e.currentTarget) closeGustoModal();
+});
 
 /* ── UTILS ── */
 function showToast(msg){
@@ -1585,9 +2664,28 @@ function showToast(msg){
   t.textContent=msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),3000);
 }
+
 function toggleMenu(){
-  document.getElementById('nav-links').classList.toggle('open');
+  const links = document.getElementById('nav-links');
+  const btn = document.getElementById('hamburger');
+  links.classList.toggle('open');
+  btn.classList.toggle('open');
 }
+
+/* ── BUTTON RIPPLE ── */
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.btn-primary, .btn-outline, .btn-maps, .nav-cta, .float-btn');
+  if(!btn) return;
+  const ripple = document.createElement('span');
+  ripple.className = 'ripple';
+  const rect = btn.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  ripple.style.width = ripple.style.height = size + 'px';
+  ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+  ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
+  btn.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 600);
+});
 
 /* ── OPEN/CLOSED badge ── */
 (function(){
@@ -1599,22 +2697,83 @@ function toggleMenu(){
   badge.style.background=open?'#2d7a3a':'#c0392b';
 })();
 
-/* ── REVEAL ON SCROLL ── */
-const observer=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
-},{threshold:0.08});
-document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+/* ── DIVERSIFIED REVEAL ON SCROLL ── */
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
+  });
+}, {threshold: 0.06});
+document.querySelectorAll('.reveal, .img-reveal').forEach(el => revealObserver.observe(el));
 
-/* ── NAV HIGHLIGHT ── */
-window.addEventListener('scroll',()=>{
-  const secs=document.querySelectorAll('section[id]');
-  const links=document.querySelectorAll('.nav-links a');
-  let cur='';
-  secs.forEach(s=>{ if(window.scrollY>=s.offsetTop-80) cur=s.id; });
-  links.forEach(l=>{
-    const active=l.getAttribute('href')==='#'+cur;
-    l.style.color=active?'var(--oro-chiaro)':'';
-    l.style.background=active?'rgba(200,150,42,0.12)':'';
+/* ── INSTA SLIDESHOW ── */
+setInterval(() => {
+  const slides = document.querySelectorAll('#insta-slideshow img');
+  if(slides.length === 0) return;
+  let activeIdx = Array.from(slides).findIndex(s => s.classList.contains('active'));
+  slides[activeIdx].classList.remove('active');
+  activeIdx = (activeIdx + 1) % slides.length;
+  slides[activeIdx].classList.add('active');
+}, 3500);
+
+
+
+/* ── NAV SCROLL EFFECTS ── */
+const nav = document.querySelector('nav');
+const navLinks = document.querySelectorAll('.nav-links a:not(.nav-cta)');
+const navIndicator = document.getElementById('nav-indicator');
+
+function updateNav() {
+  const sy = window.scrollY;
+
+  // Compact nav on scroll
+  if(sy > 80) nav.classList.add('scrolled');
+  else nav.classList.remove('scrolled');
+
+  // Active section highlight
+  const secs = document.querySelectorAll('section[id]');
+  let cur = '';
+  secs.forEach(s => { if(sy >= s.offsetTop - 100) cur = s.id; });
+
+  navLinks.forEach(l => {
+    const isActive = l.getAttribute('href') === '#' + cur;
+    l.classList.toggle('active-link', isActive);
+
+    // Move indicator
+    if(isActive && navIndicator && window.innerWidth > 900) {
+      const linkRect = l.getBoundingClientRect();
+      const navRect = l.closest('ul').getBoundingClientRect();
+      navIndicator.style.left = (linkRect.left - navRect.left) + 'px';
+      navIndicator.style.width = linkRect.width + 'px';
+    }
+  });
+}
+window.addEventListener('scroll', updateNav, {passive:true});
+updateNav();
+
+/* ── PARALLAX IMAGE ── */
+const parallaxImg = document.getElementById('parallax-img');
+if(parallaxImg) {
+  window.addEventListener('scroll', () => {
+    const wrap = document.getElementById('parallax-img-wrap');
+    if(!wrap) return;
+    const rect = wrap.getBoundingClientRect();
+    const vh = window.innerHeight;
+    if(rect.top < vh && rect.bottom > 0) {
+      const progress = (vh - rect.top) / (vh + rect.height);
+      parallaxImg.style.transform = `translateY(${-progress * 80}px)`;
+    }
+  }, {passive:true});
+}
+
+
+// Tilt effect for pasticceria cards
+document.querySelectorAll('.past3d-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    card.style.setProperty('--x', `${e.clientX - rect.left}px`);
+    card.style.setProperty('--y', `${e.clientY - rect.top}px`);
   });
 });
 </script>
