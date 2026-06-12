@@ -1429,6 +1429,77 @@ footer a:hover { text-decoration: underline; }
   .wave-divider { height: 30px; }
 }
 
+@media (max-width: 768px) {
+  body { font-size: 16px; }
+  /* Improve tap target sizes for accessibility */
+  button, .btn-primary, .btn-outline, .btn-whatsapp, .nav-cta, .float-btn, .ordina-btn, .nav-links a {
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav-links { padding: 1rem 1rem 2rem; }
+  .nav-links a { padding: 12px 0; width: 100%; }
+  
+  /* Readable typography */
+  .hero-title { font-size: clamp(2.5rem, 12vw, 3.2rem) !important; line-height: 1.1; margin-bottom: 1rem; }
+  .section-title { font-size: clamp(2rem, 9vw, 2.6rem) !important; line-height: 1.2; }
+  p, .hero-subtitle, .section-inner p, .storia-text p { font-size: 1.05rem; line-height: 1.6; }
+  
+  /* Space optimization */
+  section { padding: 4rem 1.2rem; }
+  .hero { padding-top: 100px; padding-bottom: 3rem; min-height: auto; }
+  .hero-inner { padding: 0 1rem; }
+  
+  /* Layout adjustments */
+  .gallery-grid { grid-template-columns: 1fr; gap: 1rem; }
+  .content-grid { gap: 2rem !important; }
+  .gusti-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+  .ind-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+  
+  /* Form inputs accessibility (prevent iOS zoom) */
+  input, select, textarea { font-size: 16px !important; padding: 12px !important; }
+  
+  /* Floating buttons */
+  #gelato-float { right: 1rem; bottom: 1.5rem; }
+  .float-btn { width: 56px; height: 56px; font-size: 1.5rem; }
+}
+
+@media (hover: none) {
+  /* Disable hover animations on touch devices to improve responsiveness and prevent sticky hovers */
+  .gusto-card:hover { transform: none; box-shadow: 0 12px 24px rgba(0,0,0,0.06); }
+  .gallery-item:hover img { transform: none; }
+  .btn-primary:hover, .btn-outline:hover { transform: none; }
+  .float-btn:hover { transform: none; }
+}
+
+/* ─── DESKTOP (PC) OPTIMIZATIONS ─── */
+@media (min-width: 1024px) {
+  /* Typography Readability */
+  h1, h2, .section-title, .hero-title { text-wrap: balance; }
+  p, .hero-subtitle, .storia-text p { max-width: 65ch; }
+  .hero-subtitle { margin-left: auto; margin-right: auto; }
+  
+  /* Section breathing room */
+  section { padding: 8rem 2rem; }
+  .hero { padding-top: 140px; }
+  
+  /* Grids and Spacing */
+  .content-grid { gap: 6rem; }
+  .gallery-grid { gap: 2.5rem; }
+  
+  /* Premium Hover Aesthetics */
+  .gusto-card { transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s; }
+  .gusto-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 24px 48px rgba(13,31,53,0.12); }
+  .nav-links a { position: relative; transition: color 0.3s; }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -4px; left: 0; width: 0%; height: 2px;
+    background: var(--oro-chiaro); transition: width 0.3s cubic-bezier(.23,1,.32,1);
+  }
+  .nav-links a:hover { color: var(--oro-chiaro); }
+  .nav-links a:hover::after { width: 100%; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
